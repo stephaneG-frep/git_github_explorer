@@ -1,3 +1,4 @@
+import '../models/git_command.dart';
 import '../models/lesson.dart';
 import '../models/practice_item.dart';
 import '../models/quiz_question.dart';
@@ -74,6 +75,76 @@ const List<Lesson> lessons = [
     content:
         'Un fork est une copie d un depot dans ton compte GitHub.\n\n'
         'Tu fais tes modifications dans ton fork puis proposes une Pull Request pour integrer tes changements au projet original.',
+  ),
+  Lesson(
+    id: 'clone',
+    title: 'Clone: recuperer un depot',
+    summary: 'Copier un depot distant en local pour commencer a travailler.',
+    level: 'Debutant',
+    tags: ['clone', 'depot'],
+    content:
+        'git clone <url> telecharge un depot GitHub sur ta machine.\n\n'
+        'Tu obtiens tout l historique, les branches et les fichiers du projet pour travailler localement.',
+  ),
+  Lesson(
+    id: 'remote-origin',
+    title: 'Remote et origin',
+    summary: 'Comprendre la connexion entre depot local et distant.',
+    level: 'Debutant',
+    tags: ['remote', 'origin'],
+    content:
+        'Un remote est un lien vers un depot distant (souvent GitHub).\n\n'
+        '"origin" est le nom le plus courant du remote principal. Tu peux verifier avec git remote -v.',
+  ),
+  Lesson(
+    id: 'gitignore',
+    title: '.gitignore: quoi exclure',
+    summary: 'Eviter de versionner les fichiers temporaires ou sensibles.',
+    level: 'Debutant',
+    tags: ['gitignore', 'bonnes pratiques'],
+    content:
+        'Le fichier .gitignore indique a Git quels fichiers ne pas suivre.\n\n'
+        'Exemples: fichiers build, logs, secrets locaux, dossiers temporaires.',
+  ),
+  Lesson(
+    id: 'rebase-basics',
+    title: 'Rebase: historique plus lineaire',
+    summary: 'Rejouer des commits sur une nouvelle base.',
+    level: 'Intermediaire',
+    tags: ['rebase', 'historique'],
+    content:
+        'git rebase deplace tes commits pour les rejouer sur une branche cible.\n\n'
+        'Utilise-le avec prudence sur les branches partagees. Sur ta branche locale, il aide a garder un historique propre.',
+  ),
+  Lesson(
+    id: 'stash',
+    title: 'Stash: mettre de cote rapidement',
+    summary: 'Sauvegarder provisoirement des changements non commits.',
+    level: 'Intermediaire',
+    tags: ['stash', 'workflow'],
+    content:
+        'git stash met tes modifications de cote temporairement.\n\n'
+        'Pratique quand tu dois changer de branche vite sans perdre ton travail en cours.',
+  ),
+  Lesson(
+    id: 'conflicts-resolution',
+    title: 'Resoudre un conflit',
+    summary: 'Lire, corriger et valider un conflit de merge proprement.',
+    level: 'Intermediaire',
+    tags: ['conflit', 'merge'],
+    content:
+        'Un conflit apparait quand deux changements touchent la meme zone.\n\n'
+        'Tu choisis la bonne version (ou un mix), puis git add et commit pour finaliser la resolution.',
+  ),
+  Lesson(
+    id: 'daily-workflow',
+    title: 'Workflow quotidien Git',
+    summary: 'Une routine simple pour travailler proprement en equipe.',
+    level: 'Debutant',
+    tags: ['workflow', 'equipe'],
+    content:
+        'Routine conseillee: pull -> branch -> petits commits -> push -> pull request.\n\n'
+        'Ce flux reduit les conflits et rend le code review plus facile.',
   ),
 ];
 
@@ -312,3 +383,204 @@ const Map<String, String> conceptTips = {
   'push-pull': 'Astuce: pull avant de travailler, push apres validation locale.',
   'fork-pr': 'Astuce: fork pour copier, Pull Request pour proposer tes changements.',
 };
+
+const List<GitCommand> gitCommands = [
+  GitCommand(
+    command: 'git init',
+    category: 'Base',
+    title: 'Initialiser un depot Git local',
+    what: 'Cree un depot Git dans le dossier courant.',
+    when: 'Quand tu commences un nouveau projet local.',
+    example: 'git init',
+    tip: 'Apres init, pense a faire un premier commit rapidement.',
+  ),
+  GitCommand(
+    command: 'git status',
+    category: 'Base',
+    title: 'Voir l etat du projet',
+    what: 'Affiche les fichiers modifies, indexes ou non suivis.',
+    when: 'Tres souvent, avant et apres add/commit.',
+    example: 'git status',
+    tip: 'Prends l habitude de verifier status avant chaque commit.',
+  ),
+  GitCommand(
+    command: 'git add <fichier> / git add .',
+    category: 'Base',
+    title: 'Preparer les fichiers pour commit',
+    what: 'Place les changements dans la zone de staging.',
+    when: 'Quand tu as decide ce que tu veux inclure dans le prochain commit.',
+    example: 'git add .',
+    tip: 'Prefere git add fichier_par_fichier pour des commits plus propres.',
+  ),
+  GitCommand(
+    command: 'git commit -m "message"',
+    category: 'Base',
+    title: 'Enregistrer un point d historique',
+    what: 'Cree un commit avec un message descriptif.',
+    when: 'Quand une petite unite de travail est terminee.',
+    example: 'git commit -m "feat: add login form"',
+    tip: 'Un bon message explique l intention, pas juste le fichier modifie.',
+  ),
+  GitCommand(
+    command: 'git log --oneline --graph --decorate',
+    category: 'Historique',
+    title: 'Lire l historique clairement',
+    what: 'Montre les commits de facon compacte avec graphe.',
+    when: 'Pour comprendre l ordre des commits et les branches.',
+    example: 'git log --oneline --graph --decorate',
+    tip: 'Ajoute --all pour voir toutes les branches.',
+  ),
+  GitCommand(
+    command: 'git diff',
+    category: 'Historique',
+    title: 'Comparer les changements non indexes',
+    what: 'Affiche les differences entre le fichier courant et le dernier commit.',
+    when: 'Avant add/commit pour verifier ce que tu as modifie.',
+    example: 'git diff',
+    tip: 'Utilise git diff --staged pour ce qui est deja ajoute.',
+  ),
+  GitCommand(
+    command: 'git branch',
+    category: 'Branches',
+    title: 'Lister les branches',
+    what: 'Montre les branches locales et la branche active.',
+    when: 'Pour savoir ou tu te trouves.',
+    example: 'git branch',
+    tip: 'La branche active est marquee par une etoile.',
+  ),
+  GitCommand(
+    command: 'git checkout -b <nom> / git switch -c <nom>',
+    category: 'Branches',
+    title: 'Creer et changer de branche',
+    what: 'Cree une nouvelle branche puis bascule dessus.',
+    when: 'Au debut d une nouvelle fonctionnalite.',
+    example: 'git switch -c feature/profile-page',
+    tip: 'Nomme les branches selon l objectif: feature/, fix/, chore/.',
+  ),
+  GitCommand(
+    command: 'git switch <nom>',
+    category: 'Branches',
+    title: 'Changer de branche',
+    what: 'Bascule vers une branche existante.',
+    when: 'Pour reprendre un autre travail.',
+    example: 'git switch main',
+    tip: 'Si Git refuse, commit ou stash d abord tes changements.',
+  ),
+  GitCommand(
+    command: 'git merge <branche>',
+    category: 'Fusion',
+    title: 'Fusionner une branche',
+    what: 'Integre les commits d une branche dans la branche courante.',
+    when: 'Quand une fonctionnalite est validee.',
+    example: 'git merge feature/profile-page',
+    tip: 'Fais un pull sur main avant merge pour limiter les conflits.',
+  ),
+  GitCommand(
+    command: 'git rebase <branche>',
+    category: 'Fusion',
+    title: 'Rejouer ses commits sur une autre base',
+    what: 'Repositionne tes commits sur le haut d une autre branche.',
+    when: 'Pour garder un historique lineaire sur des branches locales.',
+    example: 'git rebase main',
+    tip: 'Evite de rebase des commits deja partages en equipe.',
+  ),
+  GitCommand(
+    command: 'git stash',
+    category: 'Productivite',
+    title: 'Mettre de cote les modifs en cours',
+    what: 'Sauvegarde temporairement les changements non commits.',
+    when: 'Quand tu dois changer de branche rapidement.',
+    example: 'git stash',
+    tip: 'Recupere ensuite avec git stash pop.',
+  ),
+  GitCommand(
+    command: 'git stash pop',
+    category: 'Productivite',
+    title: 'Recuperer les modifs stashees',
+    what: 'Reapplique le dernier stash et le supprime.',
+    when: 'Quand tu reviens sur le contexte de travail.',
+    example: 'git stash pop',
+    tip: 'Si conflit, resols-le comme un merge classique.',
+  ),
+  GitCommand(
+    command: 'git clone <url>',
+    category: 'Remote',
+    title: 'Copier un depot distant en local',
+    what: 'Telecharge un depot GitHub complet sur ton poste.',
+    when: 'Au debut d une contribution sur un projet existant.',
+    example: 'git clone https://github.com/org/projet.git',
+    tip: 'Clone dans un dossier propre pour eviter les confusions.',
+  ),
+  GitCommand(
+    command: 'git remote -v',
+    category: 'Remote',
+    title: 'Verifier les depots distants',
+    what: 'Affiche les URLs de pull/push configurees.',
+    when: 'Quand push/pull ne va pas vers le bon depot.',
+    example: 'git remote -v',
+    tip: 'origin est le nom standard du remote principal.',
+  ),
+  GitCommand(
+    command: 'git fetch',
+    category: 'Remote',
+    title: 'Recuperer sans fusionner',
+    what: 'Telecharge les nouveautes distantes sans modifier ta branche.',
+    when: 'Quand tu veux inspecter avant d integrer.',
+    example: 'git fetch origin',
+    tip: 'Ensuite compare avec git log ou git diff.',
+  ),
+  GitCommand(
+    command: 'git pull',
+    category: 'Remote',
+    title: 'Recuperer et integrer',
+    what: 'Fait fetch + merge (ou rebase selon config).',
+    when: 'Avant de commencer ta journee sur une branche partagee.',
+    example: 'git pull origin main',
+    tip: 'Pull regulierement reduit les gros conflits tardifs.',
+  ),
+  GitCommand(
+    command: 'git push',
+    category: 'Remote',
+    title: 'Envoyer ses commits',
+    what: 'Publie tes commits locaux sur le depot distant.',
+    when: 'Quand ton travail local est propre et teste.',
+    example: 'git push -u origin feature/profile-page',
+    tip: '-u lie la branche locale a la branche distante pour les prochains push.',
+  ),
+  GitCommand(
+    command: 'git reset --soft HEAD~1',
+    category: 'Correction',
+    title: 'Annuler le dernier commit (garder les modifs)',
+    what: 'Retire le commit mais laisse les changements en staging.',
+    when: 'Si le message/decoupage du dernier commit est mauvais.',
+    example: 'git reset --soft HEAD~1',
+    tip: 'Utilise cette commande avec prudence sur des commits non pushes.',
+  ),
+  GitCommand(
+    command: 'git revert <hash>',
+    category: 'Correction',
+    title: 'Annuler un commit proprement',
+    what: 'Cree un nouveau commit qui annule un commit precedent.',
+    when: 'Quand le commit est deja partage avec l equipe.',
+    example: 'git revert a1b2c3d',
+    tip: 'Revert est plus sur que reset sur une branche partagee.',
+  ),
+  GitCommand(
+    command: 'git tag <nom>',
+    category: 'Release',
+    title: 'Marquer une version',
+    what: 'Ajoute une etiquette sur un commit (ex: v1.0.0).',
+    when: 'Au moment d une release stable.',
+    example: 'git tag v1.0.0',
+    tip: 'Pense a pousser les tags: git push --tags.',
+  ),
+  GitCommand(
+    command: 'git rm --cached <fichier>',
+    category: 'Correction',
+    title: 'Retirer un fichier du suivi Git',
+    what: 'Supprime un fichier de l index sans l effacer localement.',
+    when: 'Quand un fichier sensible a ete ajoute par erreur.',
+    example: 'git rm --cached .env',
+    tip: 'Ajoute ensuite le fichier dans .gitignore.',
+  ),
+];
