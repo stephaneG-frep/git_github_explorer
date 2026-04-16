@@ -8,6 +8,7 @@ class LocalStorageService {
   static const _earnedBadgesKey = 'earned_badges';
   static const _quizScoreKey = 'quiz_score';
   static const _answeredQuestionsKey = 'answered_questions';
+  static const _mistakeCountsKey = 'mistake_counts';
 
   static Future<Map<String, dynamic>> loadAppState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -20,6 +21,7 @@ class LocalStorageService {
       _earnedBadgesKey: prefs.getStringList(_earnedBadgesKey) ?? <String>[],
       _quizScoreKey: prefs.getInt(_quizScoreKey) ?? 0,
       _answeredQuestionsKey: prefs.getInt(_answeredQuestionsKey) ?? 0,
+      _mistakeCountsKey: prefs.getStringList(_mistakeCountsKey) ?? <String>[],
     };
   }
 
@@ -31,6 +33,7 @@ class LocalStorageService {
     required Set<String> earnedBadges,
     required int quizScore,
     required int answeredQuestions,
+    required Map<String, int> mistakeCounts,
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -41,5 +44,9 @@ class LocalStorageService {
     await prefs.setStringList(_earnedBadgesKey, earnedBadges.toList());
     await prefs.setInt(_quizScoreKey, quizScore);
     await prefs.setInt(_answeredQuestionsKey, answeredQuestions);
+    await prefs.setStringList(
+      _mistakeCountsKey,
+      mistakeCounts.entries.map((entry) => '${entry.key}:${entry.value}').toList(),
+    );
   }
 }

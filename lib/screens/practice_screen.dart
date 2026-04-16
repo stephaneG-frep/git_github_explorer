@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/app_data.dart';
 import '../models/practice_item.dart';
 import '../models/quiz_question.dart';
+import '../state/app_state.dart';
 import '../state/app_state_scope.dart';
 import '../widgets/badge_strip.dart';
 import '../widgets/progress_overview_card.dart';
@@ -17,14 +18,16 @@ class PracticeScreen extends StatefulWidget {
 }
 
 class _PracticeScreenState extends State<PracticeScreen> {
-  int _questionIndex = 0;
+  QuizDifficulty _selectedDifficulty = QuizDifficulty.easy;
+  String _currentQuestionId = quizQuestions.first.id;
   int? _selectedOption;
   bool _hasValidated = false;
 
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final currentQuestion = quizQuestions[_questionIndex];
+    final currentQuestion =
+        quizQuestions.firstWhere((question) => question.id == _currentQuestionId);
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +36,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
           IconButton(
             onPressed: () {
               setState(() {
-                _questionIndex = 0;
+                _selectedDifficulty = QuizDifficulty.easy;
+                _currentQuestionId = _poolForDifficulty().first.id;
                 _selectedOption = null;
                 _hasValidated = false;
               });
@@ -63,6 +67,20 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 score: appState.quizScore,
                 answered: appState.answeredQuestions,
                 total: quizQuestions.length,
+                selectedDifficulty: _selectedDifficulty,
+                onDifficultyChanged: (difficulty) {
+                  final pool = _poolForDifficulty(difficulty);
+                  setState(() {
+                    _selectedDifficulty = difficulty;
+                    _currentQuestionId = _pickBestQuestionId(
+                      appState: appState,
+                      pool: pool,
+                      excludedId: null,
+                    );
+                    _selectedOption = null;
+                    _hasValidated = false;
+                  });
+                },
                 onSelect: (index) {
                   if (_hasValidated) {
                     return;
@@ -75,7 +93,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   }
 
                   final isCorrect = _selectedOption == currentQuestion.correctIndex;
-                  appState.answerQuiz(isCorrect: isCorrect);
+                  appState.answerQuiz(
+                    isCorrect: isCorrect,
+                    conceptKey: currentQuestion.conceptKey,
+                  );
                   setState(() => _hasValidated = true);
                 },
                 onNext: () {
@@ -83,13 +104,22 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     return;
                   }
 
+                  final isCorrect = _selectedOption == currentQuestion.correctIndex;
+                  final nextId = _chooseNextQuestion(
+                    appState: appState,
+                    current: currentQuestion,
+                    lastAnswerCorrect: isCorrect,
+                  );
+
                   setState(() {
-                    _questionIndex = (_questionIndex + 1) % quizQuestions.length;
+                    _currentQuestionId = nextId;
                     _selectedOption = null;
                     _hasValidated = false;
                   });
                 },
               ),
+              const SizedBox(height: 12),
+              _MistakeInsightsCard(appState: appState),
               const SizedBox(height: 14),
               const SectionTitle(title: 'Exercices guides'),
               const SizedBox(height: 8),
@@ -137,6 +167,59 @@ class _PracticeScreenState extends State<PracticeScreen> {
       ),
     );
   }
+
+  List<QuizQuestion> _poolForDifficulty([QuizDifficulty? difficulty]) {
+    final target = difficulty ?? _selectedDifficulty;
+    final pool = quizQuestions
+        .where((question) => question.difficulty == target)
+        .toList(growable: false);
+    return pool.isEmpty ? quizQuestions : pool;
+  }
+
+  String _chooseNextQuestion({
+    required AppState appState,
+    required QuizQuestion current,
+    required bool lastAnswerCorrect,
+  }) {
+    final pool = _poolForDifficulty();
+
+    if (!lastAnswerCorrect) {
+      final sameConcept = pool.where(
+        (question) =>
+            question.conceptKey == current.conceptKey && question.id != current.id,
+      );
+      if (sameConcept.isNotEmpty) {
+        return sameConcept.first.id;
+      }
+    }
+
+    return _pickBestQuestionId(
+      appState: appState,
+      pool: pool,
+      excludedId: current.id,
+    );
+  }
+
+  String _pickBestQuestionId({
+    required AppState appState,
+    required List<QuizQuestion> pool,
+    required String? excludedId,
+  }) {
+    if (pool.isEmpty) {
+      return quizQuestions.first.id;
+    }
+
+    final candidates = pool.where((question) => question.id != excludedId).toList();
+    final safeCandidates = candidates.isEmpty ? pool : candidates;
+
+    safeCandidates.sort((a, b) {
+      final aMistakes = appState.mistakeCounts[a.conceptKey] ?? 0;
+      final bMistakes = appState.mistakeCounts[b.conceptKey] ?? 0;
+      return bMistakes.compareTo(aMistakes);
+    });
+
+    return safeCandidates.first.id;
+  }
 }
 
 class _QuizSection extends StatelessWidget {
@@ -147,6 +230,8 @@ class _QuizSection extends StatelessWidget {
     required this.score,
     required this.answered,
     required this.total,
+    required this.selectedDifficulty,
+    required this.onDifficultyChanged,
     required this.onSelect,
     required this.onValidate,
     required this.onNext,
@@ -158,6 +243,8 @@ class _QuizSection extends StatelessWidget {
   final int score;
   final int answered;
   final int total;
+  final QuizDifficulty selectedDifficulty;
+  final ValueChanged<QuizDifficulty> onDifficultyChanged;
   final ValueChanged<int> onSelect;
   final VoidCallback onValidate;
   final VoidCallback onNext;
@@ -172,13 +259,30 @@ class _QuizSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionTitle(title: 'Quiz QCM'),
+            const SectionTitle(title: 'Quiz QCM adaptatif'),
             const SizedBox(height: 4),
             Text('Score: $score / $answered  |  Questions: $answered / $total'),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              children: QuizDifficulty.values.map((difficulty) {
+                final selected = selectedDifficulty == difficulty;
+                return ChoiceChip(
+                  label: Text(_difficultyLabel(difficulty)),
+                  selected: selected,
+                  onSelected: (_) => onDifficultyChanged(difficulty),
+                );
+              }).toList(),
+            ),
             const SizedBox(height: 12),
             Text(
               question.question,
               style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Concept cible: ${question.conceptKey}',
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.72)),
             ),
             const SizedBox(height: 10),
             ...List.generate(question.options.length, (index) {
@@ -231,6 +335,79 @@ class _QuizSection extends StatelessWidget {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _difficultyLabel(QuizDifficulty difficulty) {
+    switch (difficulty) {
+      case QuizDifficulty.easy:
+        return 'Facile';
+      case QuizDifficulty.medium:
+        return 'Moyen';
+      case QuizDifficulty.hard:
+        return 'Difficile';
+    }
+  }
+}
+
+class _MistakeInsightsCard extends StatelessWidget {
+  const _MistakeInsightsCard({required this.appState});
+
+  final AppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = appState.mistakeCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final top = sorted.where((entry) => entry.value > 0).take(3).toList();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Expanded(child: SectionTitle(title: 'Erreurs frequentes')),
+                TextButton(
+                  onPressed: appState.resetMistakeInsights,
+                  child: const Text('Effacer'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (top.isEmpty)
+              const Text('Aucune erreur recurrente pour le moment, continue comme ca.')
+            else
+              ...top.map((entry) {
+                final tip = conceptTips[entry.key] ?? 'Relis la lecon associee a ce concept.';
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${entry.key}  •  ${entry.value} erreurs',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(tip),
+                      ],
+                    ),
+                  ),
+                );
+              }),
           ],
         ),
       ),

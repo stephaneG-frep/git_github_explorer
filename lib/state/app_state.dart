@@ -11,6 +11,7 @@ class AppState extends ChangeNotifier {
   final Set<String> _completedExerciseIds = <String>{};
   final Set<String> _completedChallengeIds = <String>{};
   final Set<String> _earnedBadges = <String>{};
+  final Map<String, int> _mistakeCounts = <String, int>{};
 
   int _quizScore = 0;
   int _answeredQuestions = 0;
@@ -20,6 +21,7 @@ class AppState extends ChangeNotifier {
   Set<String> get completedExerciseIds => _completedExerciseIds;
   Set<String> get completedChallengeIds => _completedChallengeIds;
   Set<String> get earnedBadges => _earnedBadges;
+  Map<String, int> get mistakeCounts => _mistakeCounts;
 
   int get quizScore => _quizScore;
   int get answeredQuestions => _answeredQuestions;
@@ -78,6 +80,16 @@ class AppState extends ChangeNotifier {
 
     _quizScore = data['quiz_score'] as int;
     _answeredQuestions = data['answered_questions'] as int;
+    _mistakeCounts
+      ..clear()
+      ..addEntries(
+        ((data['mistake_counts'] as List<dynamic>).cast<String>()).map((line) {
+          final parts = line.split(':');
+          final key = parts.first;
+          final value = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+          return MapEntry(key, value);
+        }),
+      );
 
     notifyListeners();
   }
@@ -132,10 +144,12 @@ class AppState extends ChangeNotifier {
     _afterMutation();
   }
 
-  void answerQuiz({required bool isCorrect}) {
+  void answerQuiz({required bool isCorrect, required String conceptKey}) {
     _answeredQuestions += 1;
     if (isCorrect) {
       _quizScore += 1;
+    } else {
+      _mistakeCounts[conceptKey] = (_mistakeCounts[conceptKey] ?? 0) + 1;
     }
 
     if (_quizScore >= 3) {
@@ -148,6 +162,11 @@ class AppState extends ChangeNotifier {
   void resetQuizSession() {
     _quizScore = 0;
     _answeredQuestions = 0;
+    _afterMutation();
+  }
+
+  void resetMistakeInsights() {
+    _mistakeCounts.clear();
     _afterMutation();
   }
 
@@ -171,6 +190,7 @@ class AppState extends ChangeNotifier {
       earnedBadges: _earnedBadges,
       quizScore: _quizScore,
       answeredQuestions: _answeredQuestions,
+      mistakeCounts: _mistakeCounts,
     );
   }
 }

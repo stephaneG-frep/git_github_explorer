@@ -89,6 +89,8 @@ const List<QuizQuestion> quizQuestions = [
     ],
     correctIndex: 1,
     explanation: 'Git sert a suivre les versions de ton code dans le temps.',
+    difficulty: QuizDifficulty.easy,
+    conceptKey: 'git-basics',
   ),
   QuizQuestion(
     id: 'q2',
@@ -101,6 +103,8 @@ const List<QuizQuestion> quizQuestions = [
     ],
     correctIndex: 2,
     explanation: 'GitHub heberge les depots Git et facilite la collaboration.',
+    difficulty: QuizDifficulty.easy,
+    conceptKey: 'github-basics',
   ),
   QuizQuestion(
     id: 'q3',
@@ -113,6 +117,8 @@ const List<QuizQuestion> quizQuestions = [
     ],
     correctIndex: 1,
     explanation: 'Un commit est un point de sauvegarde de ton historique Git.',
+    difficulty: QuizDifficulty.easy,
+    conceptKey: 'commit',
   ),
   QuizQuestion(
     id: 'q4',
@@ -125,6 +131,8 @@ const List<QuizQuestion> quizQuestions = [
     ],
     correctIndex: 0,
     explanation: 'Une branche permet de travailler en parallele sans impacter main.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'branch-merge',
   ),
   QuizQuestion(
     id: 'q5',
@@ -137,6 +145,50 @@ const List<QuizQuestion> quizQuestions = [
     ],
     correctIndex: 1,
     explanation: 'La Pull Request propose tes changements pour revue et fusion.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'fork-pr',
+  ),
+  QuizQuestion(
+    id: 'q6',
+    question: 'Quand utilises-tu en priorite git pull ?',
+    options: [
+      'Pour creer un nouveau depot',
+      'Pour recuperer les changements distants',
+      'Pour supprimer une branche locale',
+      'Pour renommer un commit',
+    ],
+    correctIndex: 1,
+    explanation: 'git pull recupere et integre les changements distants.',
+    difficulty: QuizDifficulty.easy,
+    conceptKey: 'push-pull',
+  ),
+  QuizQuestion(
+    id: 'q7',
+    question: 'Scenario ideal avant un merge complexe ?',
+    options: [
+      'Commit direct sur main sans verification',
+      'Mettre a jour la branche et tester avant fusion',
+      'Supprimer toutes les branches',
+      'Ignorer les conflits',
+    ],
+    correctIndex: 1,
+    explanation: 'Toujours synchroniser et tester avant de merger.',
+    difficulty: QuizDifficulty.hard,
+    conceptKey: 'branch-merge',
+  ),
+  QuizQuestion(
+    id: 'q8',
+    question: 'Un fork est surtout utile pour...',
+    options: [
+      'Contribuer a un depot que tu ne possedes pas',
+      'Compiler plus vite',
+      'Remplacer Git local',
+      'Resoudre automatiquement les conflits',
+    ],
+    correctIndex: 0,
+    explanation: 'Le fork te permet de proposer ensuite une Pull Request.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'fork-pr',
   ),
 ];
 
@@ -251,3 +303,12 @@ const List<String> badgeNames = [
   'Pull Request Hero',
   'GitHub Navigator',
 ];
+
+const Map<String, String> conceptTips = {
+  'git-basics': 'Astuce: pense a Git comme l historique de ton projet, localement.',
+  'github-basics': 'Astuce: GitHub = partage et collaboration autour de depots Git.',
+  'commit': 'Astuce: un commit = une intention claire avec un message explicite.',
+  'branch-merge': 'Astuce: branche pour isoler, merge pour integrer apres verification.',
+  'push-pull': 'Astuce: pull avant de travailler, push apres validation locale.',
+  'fork-pr': 'Astuce: fork pour copier, Pull Request pour proposer tes changements.',
+};
