@@ -14,11 +14,24 @@ class GitGithubExplorerApp extends StatefulWidget {
 
 class _GitGithubExplorerAppState extends State<GitGithubExplorerApp> {
   late final AppState _appState;
+  bool _isReady = false;
 
   @override
   void initState() {
     super.initState();
     _appState = AppState();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    try {
+      await _appState.loadPersistedState();
+    } catch (_) {
+      // In test environments, persistence plugins might be unavailable.
+    }
+    if (mounted) {
+      setState(() => _isReady = true);
+    }
   }
 
   @override
@@ -35,7 +48,13 @@ class _GitGithubExplorerAppState extends State<GitGithubExplorerApp> {
         debugShowCheckedModeBanner: false,
         title: 'Git & GitHub Explorer',
         theme: AppTheme.darkTheme,
-        home: const HomeScreen(),
+        home: _isReady
+            ? const HomeScreen()
+            : const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
       ),
     );
   }

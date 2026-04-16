@@ -7,6 +7,7 @@ import '../state/app_state_scope.dart';
 import '../widgets/badge_strip.dart';
 import '../widgets/progress_overview_card.dart';
 import '../widgets/section_title.dart';
+import 'git_simulator_screen.dart';
 
 class PracticeScreen extends StatefulWidget {
   const PracticeScreen({super.key});
@@ -107,6 +108,23 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   item: item,
                   isDone: appState.completedChallengeIds.contains(item.id),
                   onDone: () => appState.markChallengeDone(item.id),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const SectionTitle(title: 'Simulateur interactif'),
+              const SizedBox(height: 8),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.terminal_rounded),
+                  title: const Text('Lancer le mini simulateur Git'),
+                  subtitle: const Text('Scenario guide: init -> commit -> branch -> merge -> push'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const GitSimulatorScreen()),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 8),

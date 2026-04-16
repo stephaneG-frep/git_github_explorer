@@ -34,7 +34,8 @@ class _LearnScreenState extends State<LearnScreen> {
               ProgressOverviewCard(
                 title: 'Progression apprentissage',
                 progress: appState.learningProgress,
-                subtitle: '${appState.favoriteLessonIds.length} favoris sur ${lessons.length} lecons',
+                subtitle:
+                    '${appState.completedLessonIds.length}/${lessons.length} lecons lues | ${appState.unlockedLessonCount} debloquees',
               ),
               const SizedBox(height: 12),
               TextField(
@@ -56,19 +57,23 @@ class _LearnScreenState extends State<LearnScreen> {
                 )
               else
                 ...filteredLessons.map(
-                  (lesson) => LessonCard(
-                    lesson: lesson,
-                    isFavorite: appState.isFavorite(lesson.id),
-                    onFavorite: () => appState.toggleFavorite(lesson.id),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => LessonDetailScreen(lesson: lesson),
-                        ),
-                      );
-                    },
-                  ),
+                  (lesson) {
+                    final isLocked = !appState.isLessonUnlocked(lesson.id);
+                    return LessonCard(
+                      lesson: lesson,
+                      isFavorite: appState.isFavorite(lesson.id),
+                      isLocked: isLocked,
+                      onFavorite: () => appState.toggleFavorite(lesson.id),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => LessonDetailScreen(lesson: lesson),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
             ],
           );
