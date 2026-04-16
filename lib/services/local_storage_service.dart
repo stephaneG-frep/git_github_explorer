@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
+  static const _onboardingDoneKey = 'onboarding_done';
   static const _favoriteLessonIdsKey = 'favorite_lesson_ids';
   static const _completedLessonIdsKey = 'completed_lesson_ids';
   static const _completedExerciseIdsKey = 'completed_exercise_ids';
@@ -9,6 +10,16 @@ class LocalStorageService {
   static const _quizScoreKey = 'quiz_score';
   static const _answeredQuestionsKey = 'answered_questions';
   static const _mistakeCountsKey = 'mistake_counts';
+
+  static Future<bool> isOnboardingDone() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingDoneKey) ?? false;
+  }
+
+  static Future<void> setOnboardingDone(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingDoneKey, value);
+  }
 
   static Future<Map<String, dynamic>> loadAppState() async {
     final prefs = await SharedPreferences.getInstance();

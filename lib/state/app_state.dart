@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
@@ -170,6 +171,58 @@ class AppState extends ChangeNotifier {
     _afterMutation();
   }
 
+  String exportProgressJson() {
+    final payload = <String, dynamic>{
+      'version': 1,
+      'favoriteLessonIds': _favoriteLessonIds.toList(),
+      'completedLessonIds': _completedLessonIds.toList(),
+      'completedExerciseIds': _completedExerciseIds.toList(),
+      'completedChallengeIds': _completedChallengeIds.toList(),
+      'earnedBadges': _earnedBadges.toList(),
+      'quizScore': _quizScore,
+      'answeredQuestions': _answeredQuestions,
+      'mistakeCounts': _mistakeCounts,
+    };
+    return const JsonEncoder.withIndent('  ').convert(payload);
+  }
+
+  Future<bool> importProgressJson(String rawJson) async {
+    try {
+      final decoded = jsonDecode(rawJson);
+      if (decoded is! Map<String, dynamic>) {
+        return false;
+      }
+
+      _favoriteLessonIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['favoriteLessonIds']));
+      _completedLessonIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedLessonIds']));
+      _completedExerciseIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedExerciseIds']));
+      _completedChallengeIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedChallengeIds']));
+      _earnedBadges
+        ..clear()
+        ..addAll(_readStringSet(decoded['earnedBadges']));
+
+      _quizScore = (decoded['quizScore'] as num?)?.toInt() ?? 0;
+      _answeredQuestions = (decoded['answeredQuestions'] as num?)?.toInt() ?? 0;
+
+      _mistakeCounts
+        ..clear()
+        ..addAll(_readMistakeMap(decoded['mistakeCounts']));
+
+      _afterMutation();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   void _awardBadge(String badgeName) {
     if (badgeNames.contains(badgeName)) {
       _earnedBadges.add(badgeName);
@@ -192,5 +245,25 @@ class AppState extends ChangeNotifier {
       answeredQuestions: _answeredQuestions,
       mistakeCounts: _mistakeCounts,
     );
+  }
+
+  Set<String> _readStringSet(dynamic value) {
+    if (value is List) {
+      return value.whereType<String>().toSet();
+    }
+    return <String>{};
+  }
+
+  Map<String, int> _readMistakeMap(dynamic value) {
+    if (value is Map) {
+      final result = <String, int>{};
+      for (final entry in value.entries) {
+        final key = entry.key.toString();
+        final count = (entry.value as num?)?.toInt() ?? 0;
+        result[key] = count;
+      }
+      return result;
+    }
+    return <String, int>{};
   }
 }

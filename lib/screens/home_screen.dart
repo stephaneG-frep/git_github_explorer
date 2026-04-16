@@ -8,6 +8,7 @@ import '../widgets/progress_overview_card.dart';
 import '../widgets/section_title.dart';
 import 'learn_screen.dart';
 import 'practice_screen.dart';
+import 'progress_backup_screen.dart';
 import 'visualizer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -85,6 +86,23 @@ class HomeScreen extends StatelessWidget {
                 CommandOfDayCard(
                   command: command,
                   tip: 'Essaie cette commande dans un petit projet test pour memoriser.',
+                ),
+                const SizedBox(height: 12),
+                const SectionTitle(title: 'Hors-ligne & Sauvegarde'),
+                const SizedBox(height: 8),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.offline_bolt_rounded),
+                    title: const Text('Mode hors-ligne actif'),
+                    subtitle: const Text('Exporter ou importer ta progression en JSON local'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ProgressBackupScreen()),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
