@@ -7,6 +7,7 @@ class GitCommand {
     required this.when,
     required this.example,
     required this.tip,
+    this.level = 'Debutant',
   });
 
   final String command;
@@ -16,4 +17,5 @@ class GitCommand {
   final String when;
   final String example;
   final String tip;
+  final String level;
 }

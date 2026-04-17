@@ -15,6 +15,7 @@ class CommandGuideScreen extends StatefulWidget {
 class _CommandGuideScreenState extends State<CommandGuideScreen> {
   String _query = '';
   String _category = 'Toutes';
+  String _level = 'Tous';
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,8 @@ class _CommandGuideScreenState extends State<CommandGuideScreen> {
       'Toutes',
       ...{...gitCommands.map((item) => item.category)}.toList()..sort(),
     ];
-    final filtered = _filter(gitCommands, _query, _category);
+    const levels = ['Tous', 'Debutant', 'Intermediaire', 'Avance'];
+    final filtered = _filter(gitCommands, _query, _category, _level);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Guide Commandes Git')),
@@ -50,6 +52,18 @@ class _CommandGuideScreenState extends State<CommandGuideScreen> {
               );
             }).toList(),
           ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: levels.map((level) {
+              return ChoiceChip(
+                label: Text(level),
+                selected: _level == level,
+                onSelected: (_) => setState(() => _level = level),
+              );
+            }).toList(),
+          ),
           const SizedBox(height: 12),
           if (filtered.isEmpty)
             const Card(
@@ -59,23 +73,33 @@ class _CommandGuideScreenState extends State<CommandGuideScreen> {
               ),
             )
           else
-            ...filtered.map((item) => _CommandCard(item: item, onPractice: () => _openPractice(item))),
+            ...filtered.map(
+              (item) => _CommandCard(item: item, onPractice: () => _openPractice(item)),
+            ),
         ],
       ),
     );
   }
 
-  List<GitCommand> _filter(List<GitCommand> source, String query, String category) {
+  List<GitCommand> _filter(
+    List<GitCommand> source,
+    String query,
+    String category,
+    String level,
+  ) {
     final q = query.trim().toLowerCase();
     final categoryFiltered = category == 'Toutes'
         ? source
         : source.where((item) => item.category == category).toList();
+    final levelFiltered = level == 'Tous'
+        ? categoryFiltered
+        : categoryFiltered.where((item) => item.level == level).toList();
 
     if (q.isEmpty) {
-      return categoryFiltered;
+      return levelFiltered;
     }
 
-    return categoryFiltered.where((item) {
+    return levelFiltered.where((item) {
       return item.command.toLowerCase().contains(q) ||
           item.title.toLowerCase().contains(q) ||
           item.what.toLowerCase().contains(q) ||
@@ -102,7 +126,8 @@ class _CommandGuideScreenState extends State<CommandGuideScreen> {
     final normalized = command.command.toLowerCase();
     for (final exercise in commandExercises) {
       final ex = exercise.command.toLowerCase();
-      if (normalized.contains(ex) || ex.contains(normalized.split(' ').first)) {
+      final firstWord = normalized.split(' ').take(2).join(' ');
+      if (normalized.contains(ex) || ex.contains(firstWord) || firstWord.contains(ex)) {
         return exercise;
       }
     }
@@ -173,19 +198,20 @@ class _CommandCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
               children: [
-                Expanded(
-                  child: Text(
-                    item.command,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
+                Text(
+                  item.command,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Chip(label: Text(item.category)),
+                Chip(label: Text(item.level)),
               ],
             ),
             const SizedBox(height: 6),
@@ -220,6 +246,10 @@ class _CommandCard extends StatelessWidget {
         return const Color(0xFFF97316);
       case 'Release':
         return const Color(0xFFA855F7);
+      case 'Secours':
+        return const Color(0xFFF59E0B);
+      case 'Debug':
+        return const Color(0xFF14B8A6);
       default:
         return const Color(0xFF64748B);
     }
