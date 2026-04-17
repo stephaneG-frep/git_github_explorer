@@ -147,6 +147,96 @@ const List<Lesson> lessons = [
         'Routine conseillee: pull -> branch -> petits commits -> push -> pull request.\n\n'
         'Ce flux reduit les conflits et rend le code review plus facile.',
   ),
+  Lesson(
+    id: 'interactive-rebase',
+    title: 'Rebase interactif (squash/reword)',
+    summary: 'Nettoyer ton historique avant de partager.',
+    level: 'Avance',
+    tags: ['rebase', 'historique', 'squash'],
+    content:
+        'Le rebase interactif (git rebase -i) permet de reorganiser tes commits locaux.\n\n'
+        'Tu peux fusionner des commits (squash), modifier les messages (reword) et obtenir un historique plus clair avant une Pull Request.',
+  ),
+  Lesson(
+    id: 'merge-vs-rebase-vs-cherry-pick',
+    title: 'Merge vs Rebase vs Cherry-pick',
+    summary: 'Choisir la bonne strategie selon le contexte.',
+    level: 'Avance',
+    tags: ['merge', 'rebase', 'cherry-pick'],
+    content:
+        'Merge conserve la structure des branches, Rebase linearise l historique, Cherry-pick copie un commit cible.\n\n'
+        'Regle pratique: merge en equipe pour la lisibilite des branches partagees, rebase pour nettoyer une branche locale, cherry-pick pour recuperer un fix precis.',
+  ),
+  Lesson(
+    id: 'resolve-complex-conflicts',
+    title: 'Resoudre des conflits complexes',
+    summary: 'Approche fiable quand plusieurs fichiers sont impactes.',
+    level: 'Avance',
+    tags: ['conflits', 'merge', 'workflow'],
+    content:
+        'Commence par identifier les fichiers critiques, puis resous conflit par conflit avec tests intermediaires.\n\n'
+        'En cas d impasse, utilise git merge --abort ou git rebase --abort pour repartir proprement avec une meilleure strategie.',
+  ),
+  Lesson(
+    id: 'reflog-recovery',
+    title: 'Recuperer un commit perdu avec reflog',
+    summary: 'Retrouver rapidement des etats “disparus”.',
+    level: 'Avance',
+    tags: ['reflog', 'secours', 'recovery'],
+    content:
+        'git reflog enregistre les mouvements de HEAD meme apres un reset ou un rebase.\n\n'
+        'Tu peux revenir a un etat avec git reset --hard <ref_reflog> ou recreer une branche depuis ce point.',
+  ),
+  Lesson(
+    id: 'bisect-debugging',
+    title: 'Trouver la regression avec git bisect',
+    summary: 'Localiser le commit fautif de maniere efficace.',
+    level: 'Avance',
+    tags: ['bisect', 'debug', 'regression'],
+    content:
+        'git bisect applique une recherche binaire entre un commit bon (good) et un commit casse (bad).\n\n'
+        'Tu testes chaque etape proposee par Git jusqu a isoler le commit responsable.',
+  ),
+  Lesson(
+    id: 'safe-history-rewrite',
+    title: 'Reecrire l historique sans casser l equipe',
+    summary: 'Quand utiliser amend/reset/rebase de facon sure.',
+    level: 'Avance',
+    tags: ['amend', 'reset', 'rebase', 'securite'],
+    content:
+        'Les commandes de reecriture sont puissantes mais dangereuses sur branches partagees.\n\n'
+        'Principe simple: reecris seulement ce qui est local/non pousse. Sinon prefere revert pour rester collaboratif.',
+  ),
+  Lesson(
+    id: 'git-hooks-quality',
+    title: 'Automatiser la qualite avec les hooks',
+    summary: 'Lancer tests/lint automatiquement avant commit.',
+    level: 'Avance',
+    tags: ['hooks', 'qualite', 'automation'],
+    content:
+        'Les hooks Git (pre-commit, commit-msg, pre-push) permettent d appliquer des regles automatiques.\n\n'
+        'Exemple: bloquer un commit si les tests echouent ou si le message ne respecte pas un format.',
+  ),
+  Lesson(
+    id: 'release-tagging-strategy',
+    title: 'Strategie de release avec tags',
+    summary: 'Versionner proprement tes livraisons.',
+    level: 'Avance',
+    tags: ['release', 'tag', 'versioning'],
+    content:
+        'Les tags marquent des points stables (v1.0.0, v1.1.0...).\n\n'
+        'Associe-les a des notes de version et a une convention semantique pour rendre les releases previsibles.',
+  ),
+  Lesson(
+    id: 'fork-pr-advanced',
+    title: 'Workflow Fork + Pull Request avance',
+    summary: 'Contribuer proprement a des projets open source.',
+    level: 'Avance',
+    tags: ['fork', 'pull request', 'open source'],
+    content:
+        'Workflow type: fork -> clone -> branch feature -> commits propres -> push -> PR detaillee.\n\n'
+        'Maintiens ton fork a jour avec le repo upstream pour eviter les gros conflits lors des contributions.',
+  ),
 ];
 
 const List<QuizQuestion> quizQuestions = [

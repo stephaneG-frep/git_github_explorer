@@ -19,6 +19,7 @@ class LearnScreen extends StatefulWidget {
 
 class _LearnScreenState extends State<LearnScreen> {
   final TextEditingController _searchController = TextEditingController();
+  static const List<String> _orderedLevels = ['Debutant', 'Intermediaire', 'Avance'];
   String _query = '';
   String _levelFilter = 'Tous';
 
@@ -33,10 +34,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final appState = AppStateScope.of(context);
     final orderedLessons = _sortLessons(lessons);
     final filteredLessons = _filterLessons(orderedLessons, _query, _levelFilter);
-    final beginnerLessons =
-        filteredLessons.where((lesson) => lesson.level == 'Debutant').toList();
-    final intermediateLessons =
-        filteredLessons.where((lesson) => lesson.level == 'Intermediaire').toList();
+    final groupedLessons = _groupByLevel(filteredLessons);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Apprendre')),
@@ -81,7 +79,7 @@ class _LearnScreenState extends State<LearnScreen> {
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
-                children: ['Tous', 'Debutant', 'Intermediaire'].map((level) {
+                children: ['Tous', ..._orderedLevels].map((level) {
                   return ChoiceChip(
                     label: Text(level),
                     selected: _levelFilter == level,
@@ -122,18 +120,13 @@ class _LearnScreenState extends State<LearnScreen> {
                   ),
                 )
               else
-                ..._buildLessonGroup(
-                  context: context,
-                  appState: appState,
-                  title: 'Debutant',
-                  items: beginnerLessons,
-                ),
-              if (filteredLessons.isNotEmpty)
-                ..._buildLessonGroup(
-                  context: context,
-                  appState: appState,
-                  title: 'Intermediaire',
-                  items: intermediateLessons,
+                ..._orderedLevels.expand(
+                  (level) => _buildLessonGroup(
+                    context: context,
+                    appState: appState,
+                    title: level,
+                    items: groupedLessons[level] ?? const [],
+                  ),
                 ),
             ],
           );
@@ -155,14 +148,11 @@ class _LearnScreenState extends State<LearnScreen> {
   }
 
   int _levelRank(String level) {
-    switch (level) {
-      case 'Debutant':
-        return 0;
-      case 'Intermediaire':
-        return 1;
-      default:
-        return 2;
+    final index = _orderedLevels.indexOf(level);
+    if (index >= 0) {
+      return index;
     }
+    return _orderedLevels.length;
   }
 
   List<Lesson> _filterLessons(List<Lesson> source, String query, String levelFilter) {
@@ -181,6 +171,19 @@ class _LearnScreenState extends State<LearnScreen> {
       final inTags = lesson.tags.any((tag) => tag.toLowerCase().contains(q));
       return inTitle || inSummary || inTags;
     }).toList();
+  }
+
+  Map<String, List<Lesson>> _groupByLevel(List<Lesson> items) {
+    final map = <String, List<Lesson>>{};
+    for (final level in _orderedLevels) {
+      map[level] = <Lesson>[];
+    }
+
+    for (final lesson in items) {
+      map.putIfAbsent(lesson.level, () => <Lesson>[]).add(lesson);
+    }
+
+    return map;
   }
 
   List<Widget> _buildLessonGroup({
