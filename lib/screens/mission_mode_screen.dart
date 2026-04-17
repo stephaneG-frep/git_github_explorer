@@ -12,6 +12,7 @@ class MissionModeScreen extends StatefulWidget {
 }
 
 class _MissionModeScreenState extends State<MissionModeScreen> {
+  String _difficulty = 'Tous';
   int _index = 0;
   int? _selected;
   bool _validated = false;
@@ -19,7 +20,14 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final scenario = missionScenarios[_index];
+    final filtered = _filteredMissions(missionScenarios, _difficulty);
+    final safeScenarios = filtered.isEmpty ? missionScenarios : filtered;
+    if (_index >= safeScenarios.length) {
+      _index = 0;
+      _selected = null;
+      _validated = false;
+    }
+    final scenario = safeScenarios[_index];
     final completedCount = appState.completedMissionIds.length;
 
     return Scaffold(
@@ -36,7 +44,7 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Mission ${_index + 1}/${missionScenarios.length}'),
+                      Text('Mission ${_index + 1}/${safeScenarios.length}'),
                       const SizedBox(height: 8),
                       Text(
                         '$completedCount/${missionScenarios.length} missions valides',
@@ -50,6 +58,26 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: ['Tous', 'Debutant', 'Intermediaire', 'Avance']
+                    .map(
+                      (item) => ChoiceChip(
+                        label: Text(item),
+                        selected: _difficulty == item,
+                        onSelected: (_) {
+                          setState(() {
+                            _difficulty = item;
+                            _index = 0;
+                            _selected = null;
+                            _validated = false;
+                          });
+                        },
+                      ),
+                    )
+                    .toList(),
               ),
               const SizedBox(height: 12),
               _MissionCard(
@@ -67,8 +95,28 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
               if (_validated)
                 Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(scenario.explanation),
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _selected == scenario.correctIndex ? 'Bonne decision' : 'Decision risquee',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: _selected == scenario.correctIndex
+                                ? Colors.greenAccent
+                                : Colors.orangeAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(scenario.explanation),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Commande cle: ${scenario.keyCommand}',
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               const SizedBox(height: 10),
@@ -91,7 +139,7 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
                   OutlinedButton(
                     onPressed: () {
                       setState(() {
-                        _index = (_index + 1) % missionScenarios.length;
+                        _index = (_index + 1) % safeScenarios.length;
                         _selected = null;
                         _validated = false;
                       });
@@ -105,6 +153,13 @@ class _MissionModeScreenState extends State<MissionModeScreen> {
         },
       ),
     );
+  }
+
+  List<MissionScenario> _filteredMissions(List<MissionScenario> source, String difficulty) {
+    if (difficulty == 'Tous') {
+      return source;
+    }
+    return source.where((item) => item.difficulty == difficulty).toList();
   }
 }
 
@@ -131,6 +186,13 @@ class _MissionCard extends StatelessWidget {
           children: [
             Text(scenario.title, style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                Chip(label: Text('Niveau: ${scenario.difficulty}')),
+              ],
+            ),
+            const SizedBox(height: 6),
             Text(scenario.context),
             const SizedBox(height: 10),
             ...List.generate(scenario.options.length, (index) {

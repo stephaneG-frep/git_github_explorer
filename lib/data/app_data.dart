@@ -934,6 +934,8 @@ const List<MissionScenario> missionScenarios = [
     correctIndex: 0,
     explanation:
         'La bonne strategie est de traiter les conflits proprement, valider localement puis finaliser le merge.',
+    difficulty: 'Intermediaire',
+    keyCommand: 'git merge --abort',
   ),
   MissionScenario(
     id: 'm2',
@@ -948,6 +950,8 @@ const List<MissionScenario> missionScenarios = [
     correctIndex: 0,
     explanation:
         'Sur branche partagee, on evite la reecriture brutale; on corrige proprement et on traite le secret comme compromis.',
+    difficulty: 'Avance',
+    keyCommand: 'git revert <hash>',
   ),
   MissionScenario(
     id: 'm3',
@@ -962,6 +966,8 @@ const List<MissionScenario> missionScenarios = [
     correctIndex: 0,
     explanation:
         'git bisect permet d isoler rapidement le commit fautif via recherche binaire.',
+    difficulty: 'Avance',
+    keyCommand: 'git bisect start',
   ),
   MissionScenario(
     id: 'm4',
@@ -976,6 +982,8 @@ const List<MissionScenario> missionScenarios = [
     correctIndex: 0,
     explanation:
         'Un historique propre facilite la review et la maintenance. Rebase interactif est adapte tant que c est local.',
+    difficulty: 'Intermediaire',
+    keyCommand: 'git rebase -i HEAD~10',
   ),
   MissionScenario(
     id: 'm5',
@@ -990,5 +998,119 @@ const List<MissionScenario> missionScenarios = [
     correctIndex: 0,
     explanation:
         'reflog est la meilleure piste pour retrouver des etats recents de HEAD.',
+    difficulty: 'Avance',
+    keyCommand: 'git reflog',
+  ),
+  MissionScenario(
+    id: 'm6',
+    title: 'Tu as add le mauvais fichier',
+    context:
+        'README a ete ajoute dans le staging mais tu voulais seulement modifier pubspec.',
+    options: [
+      'Retirer README du staging avec git restore --staged README.md',
+      'Supprimer README du disque',
+      'Faire quand meme le commit',
+    ],
+    correctIndex: 0,
+    explanation:
+        'restore --staged enleve le fichier de la zone de staging sans perdre son contenu local.',
+    difficulty: 'Debutant',
+    keyCommand: 'git restore --staged README.md',
+  ),
+  MissionScenario(
+    id: 'm7',
+    title: 'Le dernier message de commit est mauvais',
+    context:
+        'Tu viens de commit mais le message est peu clair, et le commit n est pas encore pousse.',
+    options: [
+      'Modifier le commit avec git commit --amend',
+      'Supprimer le depot',
+      'Faire un autre commit vide pour corriger le message',
+    ],
+    correctIndex: 0,
+    explanation:
+        'git commit --amend est la methode propre pour corriger juste apres un commit local.',
+    difficulty: 'Intermediaire',
+    keyCommand: 'git commit --amend',
+  ),
+  MissionScenario(
+    id: 'm8',
+    title: 'Tu dois recuperer un seul fix',
+    context:
+        'Une autre branche contient un commit qui corrige un bug critique, sans le reste de la feature.',
+    options: [
+      'Utiliser git cherry-pick <hash>',
+      'Merger toute la branche feature',
+      'Copier-coller le code a la main',
+    ],
+    correctIndex: 0,
+    explanation:
+        'cherry-pick recupere un commit cible sans importer tout l historique de la branche source.',
+    difficulty: 'Avance',
+    keyCommand: 'git cherry-pick <hash>',
+  ),
+  MissionScenario(
+    id: 'm9',
+    title: 'La release est prete mais non marquee',
+    context:
+        'Tu veux figer la version stable actuelle pour faciliter retour arriere et notes de version.',
+    options: [
+      'Creer un tag semantique puis le pousser',
+      'Renommer la branche main',
+      'Faire un pull',
+    ],
+    correctIndex: 0,
+    explanation:
+        'Le tag permet d identifier clairement un point de release (ex: v1.2.0).',
+    difficulty: 'Intermediaire',
+    keyCommand: 'git tag v1.2.0',
+  ),
+  MissionScenario(
+    id: 'm10',
+    title: 'Workspace pollue avant build',
+    context:
+        'Des fichiers non suivis temporaires bloquent ton script de release.',
+    options: [
+      'Previsualiser avec git clean -nd puis nettoyer avec git clean -fd',
+      'Supprimer le dossier .git',
+      'Forcer un commit de tous les fichiers',
+    ],
+    correctIndex: 0,
+    explanation:
+        'git clean doit etre utilise avec prudence. Le mode -nd permet de verifier avant suppression.',
+    difficulty: 'Avance',
+    keyCommand: 'git clean -fd',
+  ),
+  MissionScenario(
+    id: 'm11',
+    title: 'Tu veux verifier un commit suspect',
+    context:
+        'Un hash est cite dans une issue et tu veux voir exactement ce qu il change.',
+    options: [
+      'Afficher le diff avec git show <hash>',
+      'Faire un reset hard',
+      'Pousser en prod',
+    ],
+    correctIndex: 0,
+    explanation:
+        'git show donne le contenu detaille du commit (message, auteur, patch).',
+    difficulty: 'Debutant',
+    keyCommand: 'git show <hash>',
+  ),
+  MissionScenario(
+    id: 'm12',
+    title: 'Contribuer a un projet open source',
+    context:
+        'Tu n as pas les droits d ecriture sur le repo principal, mais tu veux proposer une correction.',
+    options: [
+      'Fork -> clone -> branch -> commit -> push -> Pull Request',
+      'Push directement sur main du projet original',
+      'Envoyer juste un email avec le code',
+    ],
+    correctIndex: 0,
+    explanation:
+        'Le workflow Fork + PR est la methode standard de contribution externe.',
+    difficulty: 'Debutant',
+    keyCommand: 'git push origin feature/ma-correction',
   ),
 ];

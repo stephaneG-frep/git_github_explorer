@@ -6,6 +6,8 @@ class MissionScenario {
     required this.options,
     required this.correctIndex,
     required this.explanation,
+    required this.difficulty,
+    required this.keyCommand,
   });
 
   final String id;
@@ -14,4 +16,6 @@ class MissionScenario {
   final List<String> options;
   final int correctIndex;
   final String explanation;
+  final String difficulty;
+  final String keyCommand;
 }

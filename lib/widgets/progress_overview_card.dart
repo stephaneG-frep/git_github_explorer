@@ -32,10 +32,13 @@ class ProgressOverviewCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: progress.clamp(0, 1),
-              minHeight: 8,
+            ClipRRect(
               borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                value: progress.clamp(0, 1),
+                minHeight: 8,
+                backgroundColor: Colors.white.withValues(alpha: 0.08),
+              ),
             ),
             const SizedBox(height: 8),
             Text(

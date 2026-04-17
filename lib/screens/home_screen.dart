@@ -48,41 +48,50 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 const SectionTitle(title: 'Modes principaux'),
                 const SizedBox(height: 8),
-                ModeCard(
-                  title: 'Apprendre',
-                  subtitle: 'Lecons courtes et progressives',
-                  icon: Icons.menu_book_rounded,
-                  gradient: const [Color(0xFF334155), Color(0xFF1E293B)],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LearnScreen()),
-                    );
-                  },
+                _RevealCard(
+                  delayMs: 0,
+                  child: ModeCard(
+                    title: 'Apprendre',
+                    subtitle: 'Lecons courtes et progressives',
+                    icon: Icons.menu_book_rounded,
+                    gradient: const [Color(0xFF334155), Color(0xFF1E293B)],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LearnScreen()),
+                      );
+                    },
+                  ),
                 ),
-                ModeCard(
-                  title: 'Pratiquer',
-                  subtitle: 'Quiz, exercices guides et defis',
-                  icon: Icons.code_rounded,
-                  gradient: const [Color(0xFF5B21B6), Color(0xFF312E81)],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PracticeScreen()),
-                    );
-                  },
+                _RevealCard(
+                  delayMs: 70,
+                  child: ModeCard(
+                    title: 'Pratiquer',
+                    subtitle: 'Quiz, exercices guides et defis',
+                    icon: Icons.code_rounded,
+                    gradient: const [Color(0xFF5B21B6), Color(0xFF312E81)],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PracticeScreen()),
+                      );
+                    },
+                  ),
                 ),
-                ModeCard(
-                  title: 'Visualiser',
-                  subtitle: 'Schemas simples des concepts Git',
-                  icon: Icons.account_tree_rounded,
-                  gradient: const [Color(0xFF0F766E), Color(0xFF164E63)],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const VisualizerScreen()),
-                    );
-                  },
+                _RevealCard(
+                  delayMs: 140,
+                  child: ModeCard(
+                    title: 'Visualiser',
+                    subtitle: 'Schemas simples des concepts Git',
+                    icon: Icons.account_tree_rounded,
+                    gradient: const [Color(0xFF0F766E), Color(0xFF164E63)],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const VisualizerScreen()),
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(height: 12),
                 CommandOfDayCard(
@@ -92,36 +101,42 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 const SectionTitle(title: 'V3 Missions'),
                 const SizedBox(height: 8),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.calendar_month_rounded),
-                    title: const Text('Parcours 30 jours Git'),
-                    subtitle: Text(
-                      '${appState.completedPathDayIds.length}/${learningPathDays.length} jours completes',
+                _RevealCard(
+                  delayMs: 210,
+                  child: Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.calendar_month_rounded),
+                      title: const Text('Parcours 30 jours Git'),
+                      subtitle: Text(
+                        '${appState.completedPathDayIds.length}/${learningPathDays.length} jours completes',
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LearningPathScreen()),
+                        );
+                      },
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LearningPathScreen()),
-                      );
-                    },
                   ),
                 ),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.flag_rounded),
-                    title: const Text('Mode mission reelle'),
-                    subtitle: Text(
-                      '${appState.completedMissionIds.length}/${missionScenarios.length} missions valides',
+                _RevealCard(
+                  delayMs: 260,
+                  child: Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.flag_rounded),
+                      title: const Text('Mode mission reelle'),
+                      subtitle: Text(
+                        '${appState.completedMissionIds.length}/${missionScenarios.length} missions valides',
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const MissionModeScreen()),
+                        );
+                      },
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const MissionModeScreen()),
-                      );
-                    },
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -146,6 +161,36 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _RevealCard extends StatelessWidget {
+  const _RevealCard({
+    required this.delayMs,
+    required this.child,
+  });
+
+  final int delayMs;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final duration = Duration(milliseconds: 260 + (delayMs ~/ 2));
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: duration,
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 14),
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
