@@ -1,16 +1,49 @@
-# git_github_explorer
+# Git & GitHub Explorer
 
-A new Flutter project.
+Application Flutter pedagogique pour debutants afin d'apprendre Git et GitHub avec 3 modes:
+- Apprendre
+- Pratiquer
+- Visualiser
 
-## Getting Started
+## Stack
+- Flutter + Material 3 (theme sombre)
+- Donnees locales en Dart
+- Persistance locale via `shared_preferences`
 
-This project is a starting point for a Flutter application.
+## Lancer le projet
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Qualite
+```bash
+flutter analyze
+flutter test
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Fonctionnalites cle
+- Parcours de lecons debutant -> intermediaire -> avance
+- Quiz adaptatif avec difficulte
+- Exercices guides + exercices par commande + defis
+- Visualisations Git (branches, merge, conflits, push/pull, fork/PR)
+- Commande du jour, badges, favoris, progression globale
+- Export/import JSON de la progression (backup local)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Preparation publication Android
+Checklist minimale:
+1. Verifier l'ID applicatif: `com.nabucode.gitgithubexplorer`
+2. Verifier le label utilisateur: `Git & GitHub Explorer`
+3. Remplacer l'icone launcher par l'icone finale
+4. Configurer la signature release (keystore)
+5. Generer un build release:
+```bash
+flutter build apk --release
+# ou
+flutter build appbundle --release
+```
+6. Tester sur appareil reel avant soumission
+
+## Notes
+- Le projet est optimise pour mobile et usage hors-ligne.
+- Les donnees utilisateur restent locales tant qu'aucun backend n'est ajoute.

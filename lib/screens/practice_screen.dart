@@ -28,8 +28,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final currentQuestion =
-        quizQuestions.firstWhere((question) => question.id == _currentQuestionId);
+    final currentQuestion = quizQuestions.firstWhere(
+      (question) => question.id == _currentQuestionId,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +95,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     return;
                   }
 
-                  final isCorrect = _selectedOption == currentQuestion.correctIndex;
+                  final isCorrect =
+                      _selectedOption == currentQuestion.correctIndex;
                   appState.answerQuiz(
                     isCorrect: isCorrect,
                     conceptKey: currentQuestion.conceptKey,
@@ -106,7 +108,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     return;
                   }
 
-                  final isCorrect = _selectedOption == currentQuestion.correctIndex;
+                  final isCorrect =
+                      _selectedOption == currentQuestion.correctIndex;
                   final nextId = _chooseNextQuestion(
                     appState: appState,
                     current: currentQuestion,
@@ -125,14 +128,17 @@ class _PracticeScreenState extends State<PracticeScreen> {
               const SizedBox(height: 14),
               _SectionPanel(
                 title: 'Exercices guides',
-                subtitle: '${appState.completedExerciseIds.length}/${guidedExercises.length} termines',
+                subtitle:
+                    '${appState.completedExerciseIds.length}/${guidedExercises.length} termines',
                 initiallyExpanded: true,
                 child: Column(
                   children: guidedExercises
                       .map(
                         (item) => _PracticeCard(
                           item: item,
-                          isDone: appState.completedExerciseIds.contains(item.id),
+                          isDone: appState.completedExerciseIds.contains(
+                            item.id,
+                          ),
                           onDone: () => appState.markExerciseDone(item.id),
                         ),
                       )
@@ -149,7 +155,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       .map(
                         (exercise) => _CommandExerciseCard(
                           exercise: exercise,
-                          isDone: appState.completedCommandExerciseIds.contains(exercise.id),
+                          isDone: appState.completedCommandExerciseIds.contains(
+                            exercise.id,
+                          ),
                         ),
                       )
                       .toList(),
@@ -165,7 +173,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       .map(
                         (item) => _PracticeCard(
                           item: item,
-                          isDone: appState.completedChallengeIds.contains(item.id),
+                          isDone: appState.completedChallengeIds.contains(
+                            item.id,
+                          ),
                           onDone: () => appState.markChallengeDone(item.id),
                         ),
                       )
@@ -179,12 +189,16 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.terminal_rounded),
                   title: const Text('Lancer le mini simulateur Git'),
-                  subtitle: const Text('Scenario guide: init -> commit -> branch -> merge -> push'),
+                  subtitle: const Text(
+                    'Scenario guide: init -> commit -> branch -> merge -> push',
+                  ),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const GitSimulatorScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const GitSimulatorScreen(),
+                      ),
                     );
                   },
                 ),
@@ -218,7 +232,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
     if (!lastAnswerCorrect) {
       final sameConcept = pool.where(
         (question) =>
-            question.conceptKey == current.conceptKey && question.id != current.id,
+            question.conceptKey == current.conceptKey &&
+            question.id != current.id,
       );
       if (sameConcept.isNotEmpty) {
         return sameConcept.first.id;
@@ -241,7 +256,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
       return quizQuestions.first.id;
     }
 
-    final candidates = pool.where((question) => question.id != excludedId).toList();
+    final candidates = pool
+        .where((question) => question.id != excludedId)
+        .toList();
     final safeCandidates = candidates.isEmpty ? pool : candidates;
 
     safeCandidates.sort((a, b) {
@@ -308,6 +325,14 @@ class _QuizSection extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
+              'Niveau: ${_difficultyLabel(selectedDifficulty)}',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
               question.question,
               style: Theme.of(context).textTheme.titleMedium,
             ),
@@ -328,16 +353,21 @@ class _QuizSection extends StatelessWidget {
                 tileColor = Colors.red.withValues(alpha: 0.16);
               }
 
-              return Card(
-                color: tileColor,
-                child: ListTile(
-                  onTap: () => onSelect(index),
-                  leading: Icon(
-                    isSelected
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_unchecked,
+              return Semantics(
+                button: true,
+                selected: isSelected,
+                label: 'Reponse ${index + 1}. ${question.options[index]}',
+                child: Card(
+                  color: tileColor,
+                  child: ListTile(
+                    onTap: () => onSelect(index),
+                    leading: Icon(
+                      isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                    ),
+                    title: Text(question.options[index]),
                   ),
-                  title: Text(question.options[index]),
                 ),
               );
             }),
@@ -404,7 +434,9 @@ class _MistakeInsightsCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Expanded(child: SectionTitle(title: 'Erreurs frequentes')),
+                const Expanded(
+                  child: SectionTitle(title: 'Erreurs frequentes'),
+                ),
                 TextButton(
                   onPressed: appState.resetMistakeInsights,
                   child: const Text('Effacer'),
@@ -413,10 +445,14 @@ class _MistakeInsightsCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             if (top.isEmpty)
-              const Text('Aucune erreur recurrente pour le moment, continue comme ca.')
+              const Text(
+                'Aucune erreur recurrente pour le moment, continue comme ca.',
+              )
             else
               ...top.map((entry) {
-                final tip = conceptTips[entry.key] ?? 'Relis la lecon associee a ce concept.';
+                final tip =
+                    conceptTips[entry.key] ??
+                    'Relis la lecon associee a ce concept.';
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Container(
@@ -471,7 +507,10 @@ class _PracticeCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item.title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 Icon(
@@ -511,10 +550,7 @@ class _PracticeCard extends StatelessWidget {
 }
 
 class _CommandExerciseCard extends StatelessWidget {
-  const _CommandExerciseCard({
-    required this.exercise,
-    required this.isDone,
-  });
+  const _CommandExerciseCard({required this.exercise, required this.isDone});
 
   final CommandExercise exercise;
   final bool isDone;

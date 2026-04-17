@@ -446,6 +446,125 @@ const List<QuizQuestion> quizQuestions = [
     difficulty: QuizDifficulty.medium,
     conceptKey: 'fork-pr',
   ),
+  QuizQuestion(
+    id: 'q9',
+    question: 'Quand privilegier git revert plutot que git reset ?',
+    options: [
+      'Quand le commit est deja pousse sur une branche partagee',
+      'Quand on veut supprimer Git du projet',
+      'Quand on veut renommer la branche courante',
+      'Quand on veut ajouter un nouveau remote',
+    ],
+    correctIndex: 0,
+    explanation:
+        'revert est plus sur en equipe car il preserve l historique partage.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'revert-vs-reset',
+  ),
+  QuizQuestion(
+    id: 'q10',
+    question: 'A quoi sert surtout git log --oneline --graph --decorate ?',
+    options: [
+      'A executer les tests automatiquement',
+      'A voir un historique compact avec branches et pointeurs',
+      'A supprimer les anciens commits',
+      'A remplacer git status',
+    ],
+    correctIndex: 1,
+    explanation:
+        'Cette commande aide a lire rapidement la structure de l historique.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'read-history',
+  ),
+  QuizQuestion(
+    id: 'q11',
+    question: 'Tu as un conflit de merge. Quelle suite est correcte ?',
+    options: [
+      'Ignorer les marqueurs puis push',
+      'Resoudre fichier par fichier, git add, puis commit',
+      'Faire git init pour repartir propre',
+      'Supprimer la branche main',
+    ],
+    correctIndex: 1,
+    explanation:
+        'Apres resolution, il faut indexer les fichiers puis finaliser le merge.',
+    difficulty: QuizDifficulty.medium,
+    conceptKey: 'conflicts-resolution',
+  ),
+  QuizQuestion(
+    id: 'q12',
+    question: 'Quel est le principal avantage de git stash ?',
+    options: [
+      'Transformer un commit en Pull Request',
+      'Mettre temporairement de cote des changements non commits',
+      'Annuler tous les commits du projet',
+      'Ajouter un collaborateur au depot',
+    ],
+    correctIndex: 1,
+    explanation:
+        'stash permet de changer de contexte sans perdre ton travail en cours.',
+    difficulty: QuizDifficulty.easy,
+    conceptKey: 'stash',
+  ),
+  QuizQuestion(
+    id: 'q13',
+    question:
+        'Quel risque principal avec git rebase sur une branche partagee ?',
+    options: [
+      'Aucun, c est toujours recommande',
+      'Reecrire l historique vu par l equipe et creer de la confusion',
+      'Supprimer automatiquement le remote origin',
+      'Bloquer definitivement git pull',
+    ],
+    correctIndex: 1,
+    explanation:
+        'Le rebase reecrit les commits; sur branche partagee cela peut casser le flux equipe.',
+    difficulty: QuizDifficulty.hard,
+    conceptKey: 'rebase-basics',
+  ),
+  QuizQuestion(
+    id: 'q14',
+    question:
+        'Quelle commande aide a retrouver un commit “perdu” apres reset/rebase ?',
+    options: ['git blame', 'git clean -fd', 'git reflog', 'git tag'],
+    correctIndex: 2,
+    explanation:
+        'reflog garde une trace des mouvements de HEAD, utile en secours.',
+    difficulty: QuizDifficulty.hard,
+    conceptKey: 'reflog-recovery',
+  ),
+  QuizQuestion(
+    id: 'q15',
+    question:
+        'Scenario: tu veux recuperer un seul correctif d une autre branche.',
+    options: [
+      'git cherry-pick <hash>',
+      'git branch --delete main',
+      'git clone --force',
+      'git pull --all --tags --hard',
+    ],
+    correctIndex: 0,
+    explanation:
+        'cherry-pick applique un commit cible sans merger toute la branche.',
+    difficulty: QuizDifficulty.hard,
+    conceptKey: 'merge-vs-rebase-vs-cherry-pick',
+  ),
+  QuizQuestion(
+    id: 'q16',
+    question:
+        'Quel workflow est le plus propre pour contribuer en open source ?',
+    options: [
+      'Commit direct sur le depot original sans revue',
+      'Fork -> branche feature -> commits clairs -> Pull Request detaillee',
+      'Modifier main localement puis zip par mail',
+      'Rebase force sur la branche main du projet externe',
+    ],
+    correctIndex: 1,
+    explanation:
+        'Ce workflow facilite la revue et minimise les risques pour le projet original.',
+    difficulty: QuizDifficulty.hard,
+    conceptKey: 'fork-pr-advanced',
+  ),
 ];
 
 const List<PracticeItem> guidedExercises = [
@@ -573,6 +692,22 @@ const Map<String, String> conceptTips = {
       'Astuce: pull avant de travailler, push apres validation locale.',
   'fork-pr':
       'Astuce: fork pour copier, Pull Request pour proposer tes changements.',
+  'revert-vs-reset':
+      'Astuce: partagee = revert, local non pousse = reset possible.',
+  'read-history':
+      'Astuce: utilise --oneline --graph --decorate pour lire vite les branches.',
+  'conflicts-resolution':
+      'Astuce: resols calmement fichier par fichier puis teste avant commit.',
+  'stash':
+      'Astuce: stash est ideal pour changer de tache sans commit brouillon.',
+  'rebase-basics':
+      'Astuce: garde rebase sur tes branches locales pour eviter les surprises equipe.',
+  'reflog-recovery':
+      'Astuce: apres une erreur, reflog est souvent le chemin le plus court pour recuperer.',
+  'merge-vs-rebase-vs-cherry-pick':
+      'Astuce: cherry-pick pour un fix cible, merge/rebase pour un flux plus large.',
+  'fork-pr-advanced':
+      'Astuce: mets ton fork a jour avant la PR pour reduire les conflits.',
 };
 
 const List<GitCommand> gitCommands = [
