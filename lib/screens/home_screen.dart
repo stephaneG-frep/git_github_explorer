@@ -7,6 +7,8 @@ import '../widgets/mode_card.dart';
 import '../widgets/progress_overview_card.dart';
 import '../widgets/section_title.dart';
 import 'learn_screen.dart';
+import 'learning_path_screen.dart';
+import 'mission_mode_screen.dart';
 import 'practice_screen.dart';
 import 'progress_backup_screen.dart';
 import 'visualizer_screen.dart';
@@ -86,6 +88,41 @@ class HomeScreen extends StatelessWidget {
                 CommandOfDayCard(
                   command: command,
                   tip: 'Essaie cette commande dans un petit projet test pour memoriser.',
+                ),
+                const SizedBox(height: 12),
+                const SectionTitle(title: 'V3 Missions'),
+                const SizedBox(height: 8),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.calendar_month_rounded),
+                    title: const Text('Parcours 30 jours Git'),
+                    subtitle: Text(
+                      '${appState.completedPathDayIds.length}/${learningPathDays.length} jours completes',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LearningPathScreen()),
+                      );
+                    },
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.flag_rounded),
+                    title: const Text('Mode mission reelle'),
+                    subtitle: Text(
+                      '${appState.completedMissionIds.length}/${missionScenarios.length} missions valides',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MissionModeScreen()),
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(height: 12),
                 const SectionTitle(title: 'Hors-ligne & Sauvegarde'),

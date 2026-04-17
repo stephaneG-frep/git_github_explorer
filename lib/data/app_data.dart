@@ -1,6 +1,8 @@
 import '../models/command_exercise.dart';
 import '../models/git_command.dart';
+import '../models/learning_day.dart';
 import '../models/lesson.dart';
+import '../models/mission_scenario.dart';
 import '../models/practice_item.dart';
 import '../models/quiz_question.dart';
 import '../models/visual_concept.dart';
@@ -891,5 +893,102 @@ const List<CommandExercise> commandExercises = [
     title: 'Afficher un commit en detail',
     goal: 'Visualiser patch et metadonnees d un commit.',
     hint: 'Commande + hash.',
+  ),
+];
+
+final List<LearningDay> learningPathDays = List.generate(30, (index) {
+  final day = index + 1;
+  const topics = [
+    'git status',
+    'git add',
+    'git commit',
+    'git branch',
+    'git switch',
+    'git merge',
+    'git pull',
+    'git push',
+    'git stash',
+    'git log',
+  ];
+  final topic = topics[index % topics.length];
+  return LearningDay(
+    id: 'day-$day',
+    dayNumber: day,
+    title: 'Jour $day: Focus $topic',
+    task: 'Lis la lecon associee, execute la commande dans un mini depot test, puis note ce que tu as compris en 2 lignes.',
+    expectedMinutes: 10 + (index % 3) * 5,
+  );
+});
+
+const List<MissionScenario> missionScenarios = [
+  MissionScenario(
+    id: 'm1',
+    title: 'Conflit de merge urgent',
+    context:
+        'Tu merges feature/login dans main et plusieurs conflits apparaissent. Tu es bloque et la release est proche.',
+    options: [
+      'Identifier les fichiers en conflit, resoudre progressivement puis retester avant commit de merge',
+      'Supprimer les fichiers en conflit et recommencer plus tard',
+      'Forcer push pour passer outre',
+    ],
+    correctIndex: 0,
+    explanation:
+        'La bonne strategie est de traiter les conflits proprement, valider localement puis finaliser le merge.',
+  ),
+  MissionScenario(
+    id: 'm2',
+    title: 'Commit sensible deja pousse',
+    context:
+        'Un fichier .env avec secret a ete commit et pousse par erreur sur une branche partagee.',
+    options: [
+      'Utiliser git revert ou rotation de secret, puis retirer le fichier du suivi et mettre a jour .gitignore',
+      'git reset --hard et forcer push sans prevenir l equipe',
+      'Ne rien faire, ce n est pas grave',
+    ],
+    correctIndex: 0,
+    explanation:
+        'Sur branche partagee, on evite la reecriture brutale; on corrige proprement et on traite le secret comme compromis.',
+  ),
+  MissionScenario(
+    id: 'm3',
+    title: 'Regression introuvable',
+    context:
+        'Un bug est apparu il y a quelques jours, personne ne sait quel commit l a introduit.',
+    options: [
+      'Lancer git bisect entre un commit good et un commit bad',
+      'Annuler tous les commits recents',
+      'Attendre le prochain sprint',
+    ],
+    correctIndex: 0,
+    explanation:
+        'git bisect permet d isoler rapidement le commit fautif via recherche binaire.',
+  ),
+  MissionScenario(
+    id: 'm4',
+    title: 'Historique confus avant PR',
+    context:
+        'Ta branche contient 12 commits brouillons avec des messages peu clairs.',
+    options: [
+      'Faire un rebase interactif local (squash/reword) avant la Pull Request',
+      'Ouvrir la PR telle quelle',
+      'Supprimer la branche et recommencer',
+    ],
+    correctIndex: 0,
+    explanation:
+        'Un historique propre facilite la review et la maintenance. Rebase interactif est adapte tant que c est local.',
+  ),
+  MissionScenario(
+    id: 'm5',
+    title: 'Tu penses avoir perdu un commit',
+    context:
+        'Apres un reset, un commit important semble disparu de ta branche.',
+    options: [
+      'Verifier git reflog puis recreer une branche sur la reference trouvee',
+      'Abandonner ce travail',
+      'Recloner le projet en esperant que ca revienne',
+    ],
+    correctIndex: 0,
+    explanation:
+        'reflog est la meilleure piste pour retrouver des etats recents de HEAD.',
   ),
 ];

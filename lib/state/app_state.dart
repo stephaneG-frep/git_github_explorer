@@ -12,6 +12,8 @@ class AppState extends ChangeNotifier {
   final Set<String> _completedExerciseIds = <String>{};
   final Set<String> _completedCommandExerciseIds = <String>{};
   final Set<String> _completedChallengeIds = <String>{};
+  final Set<String> _completedPathDayIds = <String>{};
+  final Set<String> _completedMissionIds = <String>{};
   final Set<String> _earnedBadges = <String>{};
   final Map<String, int> _mistakeCounts = <String, int>{};
 
@@ -23,6 +25,8 @@ class AppState extends ChangeNotifier {
   Set<String> get completedExerciseIds => _completedExerciseIds;
   Set<String> get completedCommandExerciseIds => _completedCommandExerciseIds;
   Set<String> get completedChallengeIds => _completedChallengeIds;
+  Set<String> get completedPathDayIds => _completedPathDayIds;
+  Set<String> get completedMissionIds => _completedMissionIds;
   Set<String> get earnedBadges => _earnedBadges;
   Map<String, int> get mistakeCounts => _mistakeCounts;
 
@@ -55,9 +59,24 @@ class AppState extends ChangeNotifier {
     return done / total;
   }
 
+  double get roadmapProgress {
+    if (learningPathDays.isEmpty) {
+      return 0;
+    }
+    return _completedPathDayIds.length / learningPathDays.length;
+  }
+
+  double get missionProgress {
+    if (missionScenarios.isEmpty) {
+      return 0;
+    }
+    return _completedMissionIds.length / missionScenarios.length;
+  }
+
   double get globalProgress {
     final quizPart = quizQuestions.isEmpty ? 0 : _answeredQuestions / quizQuestions.length;
-    return ((learningProgress + practiceProgress + quizPart) / 3).clamp(0, 1);
+    return ((learningProgress + practiceProgress + roadmapProgress + missionProgress + quizPart) / 5)
+        .clamp(0, 1);
   }
 
   Future<void> loadPersistedState() async {
@@ -82,6 +101,14 @@ class AppState extends ChangeNotifier {
     _completedChallengeIds
       ..clear()
       ..addAll((data['completed_challenge_ids'] as List<dynamic>).cast<String>());
+
+    _completedPathDayIds
+      ..clear()
+      ..addAll((data['completed_path_day_ids'] as List<dynamic>).cast<String>());
+
+    _completedMissionIds
+      ..clear()
+      ..addAll((data['completed_mission_ids'] as List<dynamic>).cast<String>());
 
     _earnedBadges
       ..clear()
@@ -164,6 +191,22 @@ class AppState extends ChangeNotifier {
     _afterMutation();
   }
 
+  void markPathDayDone(String dayId) {
+    _completedPathDayIds.add(dayId);
+    if (_completedPathDayIds.length >= 7) {
+      _awardBadge('Branch Explorer');
+    }
+    _afterMutation();
+  }
+
+  void markMissionDone(String missionId) {
+    _completedMissionIds.add(missionId);
+    if (_completedMissionIds.length >= 3) {
+      _awardBadge('Pull Request Hero');
+    }
+    _afterMutation();
+  }
+
   void answerQuiz({required bool isCorrect, required String conceptKey}) {
     _answeredQuestions += 1;
     if (isCorrect) {
@@ -192,12 +235,14 @@ class AppState extends ChangeNotifier {
 
   String exportProgressJson() {
     final payload = <String, dynamic>{
-      'version': 1,
+      'version': 2,
       'favoriteLessonIds': _favoriteLessonIds.toList(),
       'completedLessonIds': _completedLessonIds.toList(),
       'completedExerciseIds': _completedExerciseIds.toList(),
       'completedCommandExerciseIds': _completedCommandExerciseIds.toList(),
       'completedChallengeIds': _completedChallengeIds.toList(),
+      'completedPathDayIds': _completedPathDayIds.toList(),
+      'completedMissionIds': _completedMissionIds.toList(),
       'earnedBadges': _earnedBadges.toList(),
       'quizScore': _quizScore,
       'answeredQuestions': _answeredQuestions,
@@ -228,6 +273,12 @@ class AppState extends ChangeNotifier {
       _completedChallengeIds
         ..clear()
         ..addAll(_readStringSet(decoded['completedChallengeIds']));
+      _completedPathDayIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedPathDayIds']));
+      _completedMissionIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedMissionIds']));
       _earnedBadges
         ..clear()
         ..addAll(_readStringSet(decoded['earnedBadges']));
@@ -264,6 +315,8 @@ class AppState extends ChangeNotifier {
       completedExerciseIds: _completedExerciseIds,
       completedCommandExerciseIds: _completedCommandExerciseIds,
       completedChallengeIds: _completedChallengeIds,
+      completedPathDayIds: _completedPathDayIds,
+      completedMissionIds: _completedMissionIds,
       earnedBadges: _earnedBadges,
       quizScore: _quizScore,
       answeredQuestions: _answeredQuestions,
