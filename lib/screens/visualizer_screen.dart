@@ -14,17 +14,49 @@ class VisualizerScreen extends StatefulWidget {
 
 class _VisualizerScreenState extends State<VisualizerScreen> {
   String _filter = 'Tous';
+  String _query = '';
   int _autoPlaySignal = 0;
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filterConcepts(visualConcepts, _filter);
+    final filtered = _filterConcepts(visualConcepts, _filter, _query);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Visualiser')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF1B3357),
+                  Color(0xFF3C2A85),
+                  Color(0xFF0D6879),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Visualiser pour mieux retenir',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Lis un schema et avance etape par etape pour comprendre le flux Git sans te noyer.',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -35,11 +67,26 @@ class _VisualizerScreenState extends State<VisualizerScreen> {
                   const SizedBox(height: 8),
                   Text(
                     '${filtered.length} schema(s) affiches',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.78)),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.78),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const _LegendRow(),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                onChanged: (value) => setState(() => _query = value),
+                decoration: const InputDecoration(
+                  hintText: 'Rechercher un schema (merge, conflit, pull...)',
+                  prefixIcon: Icon(Icons.search_rounded),
+                ),
               ),
             ),
           ),
@@ -67,26 +114,42 @@ class _VisualizerScreenState extends State<VisualizerScreen> {
             ),
           ),
           const SizedBox(height: 6),
-          ...filtered.map(
-            (concept) => VisualConceptCard(
-              concept: concept,
-              categoryLabel: _categoryLabel(concept),
-              autoPlaySignal: _autoPlaySignal,
+          if (filtered.isEmpty)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(14),
+                child: Text('Aucun schema trouve avec ce filtre.'),
+              ),
+            )
+          else
+            ...filtered.map(
+              (concept) => VisualConceptCard(
+                concept: concept,
+                categoryLabel: _categoryLabel(concept),
+                autoPlaySignal: _autoPlaySignal,
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  List<VisualConcept> _filterConcepts(List<VisualConcept> source, String filter) {
-    if (filter == 'Tous') {
-      return source;
-    }
-
+  List<VisualConcept> _filterConcepts(
+    List<VisualConcept> source,
+    String filter,
+    String query,
+  ) {
+    final q = query.trim().toLowerCase();
     return source.where((concept) {
       final category = _categoryLabel(concept);
-      return category == filter;
+      final categoryMatch = filter == 'Tous' || category == filter;
+      final searchable = [
+        concept.title,
+        concept.description,
+        ...concept.nodes,
+      ].join(' ').toLowerCase();
+      final queryMatch = q.isEmpty || searchable.contains(q);
+      return categoryMatch && queryMatch;
     }).toList();
   }
 
@@ -95,7 +158,9 @@ class _VisualizerScreenState extends State<VisualizerScreen> {
     if (title.contains('commit') || title.contains('historique')) {
       return 'Historique';
     }
-    if (title.contains('branch') || title.contains('merge') || title.contains('conflit')) {
+    if (title.contains('branch') ||
+        title.contains('merge') ||
+        title.contains('conflit')) {
       return 'Branches/Fusion';
     }
     return 'Remote/Collab';

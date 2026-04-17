@@ -35,14 +35,22 @@ Checklist minimale:
 1. Verifier l'ID applicatif: `com.nabucode.gitgithubexplorer`
 2. Verifier le label utilisateur: `Git & GitHub Explorer`
 3. Remplacer l'icone launcher par l'icone finale
-4. Configurer la signature release (keystore)
-5. Generer un build release:
+4. Configurer la signature release (keystore):
+```bash
+cp android/key.properties.example android/key.properties
+# puis remplir android/key.properties avec tes vraies valeurs
+```
+5. Mettre a jour la version dans `pubspec.yaml`:
+```yaml
+version: 1.1.0+2
+```
+6. Generer un build release:
 ```bash
 flutter build apk --release
 # ou
 flutter build appbundle --release
 ```
-6. Tester sur appareil reel avant soumission
+7. Tester sur appareil reel avant soumission
 
 ## Notes
 - Le projet est optimise pour mobile et usage hors-ligne.
