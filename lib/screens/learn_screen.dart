@@ -18,8 +18,15 @@ class LearnScreen extends StatefulWidget {
 }
 
 class _LearnScreenState extends State<LearnScreen> {
+  final TextEditingController _searchController = TextEditingController();
   String _query = '';
   String _levelFilter = 'Tous';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +71,7 @@ class _LearnScreenState extends State<LearnScreen> {
               ),
               const SizedBox(height: 12),
               TextField(
+                controller: _searchController,
                 onChanged: (value) => setState(() => _query = value),
                 decoration: const InputDecoration(
                   hintText: 'Rechercher un concept (commit, branch, pull...)',
@@ -82,6 +90,28 @@ class _LearnScreenState extends State<LearnScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${filteredLessons.length} resultat(s)',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.78)),
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _query = '';
+                        _levelFilter = 'Tous';
+                      });
+                      _searchController.clear();
+                    },
+                    icon: const Icon(Icons.filter_alt_off_outlined, size: 18),
+                    label: const Text('Reset filtres'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
               const SectionTitle(title: 'Lecons organisees'),
               const SizedBox(height: 8),
               if (filteredLessons.isEmpty)

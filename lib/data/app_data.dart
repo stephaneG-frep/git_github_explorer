@@ -1,3 +1,4 @@
+import '../models/command_exercise.dart';
 import '../models/git_command.dart';
 import '../models/lesson.dart';
 import '../models/practice_item.dart';
@@ -582,5 +583,78 @@ const List<GitCommand> gitCommands = [
     when: 'Quand un fichier sensible a ete ajoute par erreur.',
     example: 'git rm --cached .env',
     tip: 'Ajoute ensuite le fichier dans .gitignore.',
+  ),
+];
+
+const List<CommandExercise> commandExercises = [
+  CommandExercise(
+    id: 'ce-init',
+    command: 'git init',
+    title: 'Initialiser un depot',
+    goal: 'Demarrer Git dans un dossier local.',
+    hint: 'Commande exacte sans argument.',
+  ),
+  CommandExercise(
+    id: 'ce-status',
+    command: 'git status',
+    title: 'Verifier l etat',
+    goal: 'Consulter les fichiers modifies avant de commit.',
+    hint: 'C est la commande de verification la plus frequente.',
+  ),
+  CommandExercise(
+    id: 'ce-add',
+    command: 'git add .',
+    title: 'Ajouter les changements',
+    goal: 'Placer les modifs dans le staging.',
+    hint: 'Version courte qui ajoute tous les fichiers modifies.',
+  ),
+  CommandExercise(
+    id: 'ce-commit',
+    command: 'git commit -m "first commit"',
+    title: 'Premier commit',
+    goal: 'Creer un commit avec un message clair.',
+    hint: 'Utilise -m suivi d un message entre guillemets.',
+  ),
+  CommandExercise(
+    id: 'ce-branch',
+    command: 'git switch -c feature/login',
+    title: 'Creer une branche',
+    goal: 'Demarrer un travail isole dans une branche feature.',
+    hint: 'Commande moderne: switch -c.',
+  ),
+  CommandExercise(
+    id: 'ce-merge',
+    command: 'git merge feature/login',
+    title: 'Fusionner une branche',
+    goal: 'Integrer la branche feature dans la branche courante.',
+    hint: 'Tu es generalement sur main avant de lancer merge.',
+  ),
+  CommandExercise(
+    id: 'ce-pull',
+    command: 'git pull origin main',
+    title: 'Recuperer les changements distants',
+    goal: 'Synchroniser local avec le depot distant.',
+    hint: 'Pense a remote + nom de branche.',
+  ),
+  CommandExercise(
+    id: 'ce-push',
+    command: 'git push -u origin main',
+    title: 'Publier les commits',
+    goal: 'Envoyer la branche locale vers GitHub.',
+    hint: '-u cree le lien local/distant pour la suite.',
+  ),
+  CommandExercise(
+    id: 'ce-stash',
+    command: 'git stash',
+    title: 'Mettre en pause des modifications',
+    goal: 'Sauvegarder temporairement le travail en cours.',
+    hint: 'Pratique juste avant un changement de branche urgent.',
+  ),
+  CommandExercise(
+    id: 'ce-log',
+    command: 'git log --oneline --graph --decorate',
+    title: 'Lire l historique compact',
+    goal: 'Visualiser commits et branches dans le terminal.',
+    hint: 'Commande utile pour comprendre la timeline.',
   ),
 ];

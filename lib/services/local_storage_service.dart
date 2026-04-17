@@ -5,6 +5,7 @@ class LocalStorageService {
   static const _favoriteLessonIdsKey = 'favorite_lesson_ids';
   static const _completedLessonIdsKey = 'completed_lesson_ids';
   static const _completedExerciseIdsKey = 'completed_exercise_ids';
+  static const _completedCommandExerciseIdsKey = 'completed_command_exercise_ids';
   static const _completedChallengeIdsKey = 'completed_challenge_ids';
   static const _earnedBadgesKey = 'earned_badges';
   static const _quizScoreKey = 'quiz_score';
@@ -28,6 +29,8 @@ class LocalStorageService {
       _favoriteLessonIdsKey: prefs.getStringList(_favoriteLessonIdsKey) ?? <String>[],
       _completedLessonIdsKey: prefs.getStringList(_completedLessonIdsKey) ?? <String>[],
       _completedExerciseIdsKey: prefs.getStringList(_completedExerciseIdsKey) ?? <String>[],
+      _completedCommandExerciseIdsKey:
+          prefs.getStringList(_completedCommandExerciseIdsKey) ?? <String>[],
       _completedChallengeIdsKey: prefs.getStringList(_completedChallengeIdsKey) ?? <String>[],
       _earnedBadgesKey: prefs.getStringList(_earnedBadgesKey) ?? <String>[],
       _quizScoreKey: prefs.getInt(_quizScoreKey) ?? 0,
@@ -40,6 +43,7 @@ class LocalStorageService {
     required Set<String> favoriteLessonIds,
     required Set<String> completedLessonIds,
     required Set<String> completedExerciseIds,
+    required Set<String> completedCommandExerciseIds,
     required Set<String> completedChallengeIds,
     required Set<String> earnedBadges,
     required int quizScore,
@@ -51,6 +55,10 @@ class LocalStorageService {
     await prefs.setStringList(_favoriteLessonIdsKey, favoriteLessonIds.toList());
     await prefs.setStringList(_completedLessonIdsKey, completedLessonIds.toList());
     await prefs.setStringList(_completedExerciseIdsKey, completedExerciseIds.toList());
+    await prefs.setStringList(
+      _completedCommandExerciseIdsKey,
+      completedCommandExerciseIds.toList(),
+    );
     await prefs.setStringList(_completedChallengeIdsKey, completedChallengeIds.toList());
     await prefs.setStringList(_earnedBadgesKey, earnedBadges.toList());
     await prefs.setInt(_quizScoreKey, quizScore);

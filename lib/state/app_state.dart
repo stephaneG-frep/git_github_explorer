@@ -10,6 +10,7 @@ class AppState extends ChangeNotifier {
   final Set<String> _favoriteLessonIds = <String>{};
   final Set<String> _completedLessonIds = <String>{};
   final Set<String> _completedExerciseIds = <String>{};
+  final Set<String> _completedCommandExerciseIds = <String>{};
   final Set<String> _completedChallengeIds = <String>{};
   final Set<String> _earnedBadges = <String>{};
   final Map<String, int> _mistakeCounts = <String, int>{};
@@ -20,6 +21,7 @@ class AppState extends ChangeNotifier {
   Set<String> get favoriteLessonIds => _favoriteLessonIds;
   Set<String> get completedLessonIds => _completedLessonIds;
   Set<String> get completedExerciseIds => _completedExerciseIds;
+  Set<String> get completedCommandExerciseIds => _completedCommandExerciseIds;
   Set<String> get completedChallengeIds => _completedChallengeIds;
   Set<String> get earnedBadges => _earnedBadges;
   Map<String, int> get mistakeCounts => _mistakeCounts;
@@ -43,8 +45,10 @@ class AppState extends ChangeNotifier {
   }
 
   double get practiceProgress {
-    final total = guidedExercises.length + simpleChallenges.length;
-    final done = _completedExerciseIds.length + _completedChallengeIds.length;
+    final total = guidedExercises.length + commandExercises.length + simpleChallenges.length;
+    final done = _completedExerciseIds.length +
+        _completedCommandExerciseIds.length +
+        _completedChallengeIds.length;
     if (total == 0) {
       return 0;
     }
@@ -70,6 +74,10 @@ class AppState extends ChangeNotifier {
     _completedExerciseIds
       ..clear()
       ..addAll((data['completed_exercise_ids'] as List<dynamic>).cast<String>());
+
+    _completedCommandExerciseIds
+      ..clear()
+      ..addAll((data['completed_command_exercise_ids'] as List<dynamic>).cast<String>());
 
     _completedChallengeIds
       ..clear()
@@ -137,6 +145,17 @@ class AppState extends ChangeNotifier {
     _afterMutation();
   }
 
+  void markCommandExerciseDone(String exerciseId) {
+    _completedCommandExerciseIds.add(exerciseId);
+    if (_completedCommandExerciseIds.length >= 2) {
+      _awardBadge('Merge Tamer');
+    }
+    if (_completedCommandExerciseIds.length >= 5) {
+      _awardBadge('GitHub Navigator');
+    }
+    _afterMutation();
+  }
+
   void markChallengeDone(String challengeId) {
     _completedChallengeIds.add(challengeId);
     if (_completedChallengeIds.isNotEmpty) {
@@ -177,6 +196,7 @@ class AppState extends ChangeNotifier {
       'favoriteLessonIds': _favoriteLessonIds.toList(),
       'completedLessonIds': _completedLessonIds.toList(),
       'completedExerciseIds': _completedExerciseIds.toList(),
+      'completedCommandExerciseIds': _completedCommandExerciseIds.toList(),
       'completedChallengeIds': _completedChallengeIds.toList(),
       'earnedBadges': _earnedBadges.toList(),
       'quizScore': _quizScore,
@@ -202,6 +222,9 @@ class AppState extends ChangeNotifier {
       _completedExerciseIds
         ..clear()
         ..addAll(_readStringSet(decoded['completedExerciseIds']));
+      _completedCommandExerciseIds
+        ..clear()
+        ..addAll(_readStringSet(decoded['completedCommandExerciseIds']));
       _completedChallengeIds
         ..clear()
         ..addAll(_readStringSet(decoded['completedChallengeIds']));
@@ -239,6 +262,7 @@ class AppState extends ChangeNotifier {
       favoriteLessonIds: _favoriteLessonIds,
       completedLessonIds: _completedLessonIds,
       completedExerciseIds: _completedExerciseIds,
+      completedCommandExerciseIds: _completedCommandExerciseIds,
       completedChallengeIds: _completedChallengeIds,
       earnedBadges: _earnedBadges,
       quizScore: _quizScore,

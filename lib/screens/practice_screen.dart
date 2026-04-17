@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/app_data.dart';
+import '../models/command_exercise.dart';
 import '../models/practice_item.dart';
 import '../models/quiz_question.dart';
 import '../state/app_state.dart';
@@ -8,6 +9,7 @@ import '../state/app_state_scope.dart';
 import '../widgets/badge_strip.dart';
 import '../widgets/progress_overview_card.dart';
 import '../widgets/section_title.dart';
+import 'command_exercise_screen.dart';
 import 'git_simulator_screen.dart';
 
 class PracticeScreen extends StatefulWidget {
@@ -121,23 +123,53 @@ class _PracticeScreenState extends State<PracticeScreen> {
               const SizedBox(height: 12),
               _MistakeInsightsCard(appState: appState),
               const SizedBox(height: 14),
-              const SectionTitle(title: 'Exercices guides'),
-              const SizedBox(height: 8),
-              ...guidedExercises.map(
-                (item) => _PracticeCard(
-                  item: item,
-                  isDone: appState.completedExerciseIds.contains(item.id),
-                  onDone: () => appState.markExerciseDone(item.id),
+              _SectionPanel(
+                title: 'Exercices guides',
+                subtitle: '${appState.completedExerciseIds.length}/${guidedExercises.length} termines',
+                initiallyExpanded: true,
+                child: Column(
+                  children: guidedExercises
+                      .map(
+                        (item) => _PracticeCard(
+                          item: item,
+                          isDone: appState.completedExerciseIds.contains(item.id),
+                          onDone: () => appState.markExerciseDone(item.id),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               const SizedBox(height: 8),
-              const SectionTitle(title: 'Defis simples'),
+              _SectionPanel(
+                title: 'Exercices par commande',
+                subtitle:
+                    '${appState.completedCommandExerciseIds.length}/${commandExercises.length} termines',
+                child: Column(
+                  children: commandExercises
+                      .map(
+                        (exercise) => _CommandExerciseCard(
+                          exercise: exercise,
+                          isDone: appState.completedCommandExerciseIds.contains(exercise.id),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
               const SizedBox(height: 8),
-              ...simpleChallenges.map(
-                (item) => _PracticeCard(
-                  item: item,
-                  isDone: appState.completedChallengeIds.contains(item.id),
-                  onDone: () => appState.markChallengeDone(item.id),
+              _SectionPanel(
+                title: 'Defis simples',
+                subtitle:
+                    '${appState.completedChallengeIds.length}/${simpleChallenges.length} termines',
+                child: Column(
+                  children: simpleChallenges
+                      .map(
+                        (item) => _PracticeCard(
+                          item: item,
+                          isDone: appState.completedChallengeIds.contains(item.id),
+                          onDone: () => appState.markChallengeDone(item.id),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               const SizedBox(height: 8),
@@ -473,6 +505,67 @@ class _PracticeCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CommandExerciseCard extends StatelessWidget {
+  const _CommandExerciseCard({
+    required this.exercise,
+    required this.isDone,
+  });
+
+  final CommandExercise exercise;
+  final bool isDone;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: Icon(
+          isDone ? Icons.check_circle : Icons.terminal_rounded,
+          color: isDone ? Colors.greenAccent : null,
+        ),
+        title: Text(exercise.title),
+        subtitle: Text('${exercise.command}\n${exercise.goal}'),
+        isThreeLine: true,
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CommandExerciseScreen(exercise: exercise),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SectionPanel extends StatelessWidget {
+  const _SectionPanel({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.initiallyExpanded = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final bool initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ExpansionTile(
+        initiallyExpanded: initiallyExpanded,
+        title: Text(title),
+        subtitle: Text(subtitle),
+        childrenPadding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        children: [child],
       ),
     );
   }
