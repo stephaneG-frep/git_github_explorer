@@ -239,6 +239,96 @@ const List<Lesson> lessons = [
         'Workflow type: fork -> clone -> branch feature -> commits propres -> push -> PR detaillee.\n\n'
         'Maintiens ton fork a jour avec le repo upstream pour eviter les gros conflits lors des contributions.',
   ),
+  Lesson(
+    id: 'revert-vs-reset',
+    title: 'Revert vs Reset: annuler sans casser',
+    summary: 'Choisir la bonne commande pour annuler en securite.',
+    level: 'Intermediaire',
+    tags: ['revert', 'reset', 'securite'],
+    content:
+        'git revert cree un nouveau commit qui annule un ancien commit: c est ideal sur une branche partagee.\n\n'
+        'git reset reecrit l historique local: tres utile avant de pousser, mais risquee si deja partagee.',
+  ),
+  Lesson(
+    id: 'read-history',
+    title: 'Lire l historique avec git log',
+    summary: 'Comprendre vite ce qui s est passe dans le depot.',
+    level: 'Intermediaire',
+    tags: ['log', 'historique', 'analyse'],
+    content:
+        'git log --oneline --graph --decorate donne une vue compacte et lisible de l historique.\n\n'
+        'Ajoute des filtres (auteur, date, fichier) pour enqueter rapidement sur un changement.',
+  ),
+  Lesson(
+    id: 'git-blame-basics',
+    title: 'Retrouver l origine d une ligne avec git blame',
+    summary: 'Identifier le commit et le contexte d une modification.',
+    level: 'Avance',
+    tags: ['blame', 'debug', 'historique'],
+    content:
+        'git blame <fichier> montre pour chaque ligne le commit et l auteur associes.\n\n'
+        'Utilise-le pour comprendre le “pourquoi” d un code avant de le modifier, sans chercher a blamer une personne.',
+  ),
+  Lesson(
+    id: 'worktree-parallel',
+    title: 'Travailler sur deux branches en parallele avec worktree',
+    summary: 'Eviter les allers-retours constants de checkout.',
+    level: 'Avance',
+    tags: ['worktree', 'branches', 'productivite'],
+    content:
+        'git worktree add permet d ouvrir une autre branche dans un second dossier, avec le meme depot.\n\n'
+        'Tres pratique pour corriger un hotfix pendant qu une feature reste ouverte ailleurs.',
+  ),
+  Lesson(
+    id: 'submodule-basics',
+    title: 'Submodule: gerer un depot dans un depot',
+    summary: 'Versionner une dependance Git de facon explicite.',
+    level: 'Avance',
+    tags: ['submodule', 'dependances', 'architecture'],
+    content:
+        'Un submodule pointe vers un commit precis d un autre depot.\n\n'
+        'C est utile pour partager une librairie interne tout en gardant un controle strict de la version utilisee.',
+  ),
+  Lesson(
+    id: 'sparse-checkout',
+    title: 'Sparse-checkout pour gros monorepo',
+    summary: 'Ne charger localement que les dossiers utiles.',
+    level: 'Avance',
+    tags: ['sparse-checkout', 'monorepo', 'performance'],
+    content:
+        'Le mode sparse-checkout limite les fichiers extraits dans ton working tree.\n\n'
+        'Tu acceleres le travail sur de tres grands depots en te concentrant sur un sous-ensemble de dossiers.',
+  ),
+  Lesson(
+    id: 'rerere-conflicts',
+    title: 'Memoriser les resolutions avec rerere',
+    summary: 'Gagner du temps sur des conflits repetitifs.',
+    level: 'Avance',
+    tags: ['rerere', 'conflits', 'merge'],
+    content:
+        'rerere signifie “reuse recorded resolution”. Git memorise comment tu as resolu un conflit precedent.\n\n'
+        'Quand un conflit similaire reapparait, Git peut reappliquer automatiquement ta resolution.',
+  ),
+  Lesson(
+    id: 'commit-signing',
+    title: 'Signer ses commits',
+    summary: 'Prouver l authenticite de tes commits et tags.',
+    level: 'Avance',
+    tags: ['signature', 'securite', 'collaboration'],
+    content:
+        'La signature GPG ou SSH ajoute une preuve cryptographique sur les commits et tags.\n\n'
+        'Dans une equipe, cela renforce la confiance sur l origine des changements.',
+  ),
+  Lesson(
+    id: 'hotfix-release-flow',
+    title: 'Workflow hotfix en production',
+    summary: 'Corriger vite sans destabiliser la prochaine release.',
+    level: 'Avance',
+    tags: ['hotfix', 'release', 'workflow'],
+    content:
+        'Approche type: creer une branche hotfix depuis le tag de production, corriger, tester, merger puis tagger une nouvelle version.\n\n'
+        'Ensuite, reporte aussi le correctif vers la branche de developpement pour eviter la regression.',
+  ),
 ];
 
 const List<QuizQuestion> quizQuestions = [
@@ -294,7 +384,8 @@ const List<QuizQuestion> quizQuestions = [
       'Remplacer GitHub',
     ],
     correctIndex: 0,
-    explanation: 'Une branche permet de travailler en parallele sans impacter main.',
+    explanation:
+        'Une branche permet de travailler en parallele sans impacter main.',
     difficulty: QuizDifficulty.medium,
     conceptKey: 'branch-merge',
   ),
@@ -308,7 +399,8 @@ const List<QuizQuestion> quizQuestions = [
       'Une commande Linux',
     ],
     correctIndex: 1,
-    explanation: 'La Pull Request propose tes changements pour revue et fusion.',
+    explanation:
+        'La Pull Request propose tes changements pour revue et fusion.',
     difficulty: QuizDifficulty.medium,
     conceptKey: 'fork-pr',
   ),
@@ -469,12 +561,18 @@ const List<String> badgeNames = [
 ];
 
 const Map<String, String> conceptTips = {
-  'git-basics': 'Astuce: pense a Git comme l historique de ton projet, localement.',
-  'github-basics': 'Astuce: GitHub = partage et collaboration autour de depots Git.',
-  'commit': 'Astuce: un commit = une intention claire avec un message explicite.',
-  'branch-merge': 'Astuce: branche pour isoler, merge pour integrer apres verification.',
-  'push-pull': 'Astuce: pull avant de travailler, push apres validation locale.',
-  'fork-pr': 'Astuce: fork pour copier, Pull Request pour proposer tes changements.',
+  'git-basics':
+      'Astuce: pense a Git comme l historique de ton projet, localement.',
+  'github-basics':
+      'Astuce: GitHub = partage et collaboration autour de depots Git.',
+  'commit':
+      'Astuce: un commit = une intention claire avec un message explicite.',
+  'branch-merge':
+      'Astuce: branche pour isoler, merge pour integrer apres verification.',
+  'push-pull':
+      'Astuce: pull avant de travailler, push apres validation locale.',
+  'fork-pr':
+      'Astuce: fork pour copier, Pull Request pour proposer tes changements.',
 };
 
 const List<GitCommand> gitCommands = [
@@ -527,7 +625,8 @@ const List<GitCommand> gitCommands = [
     command: 'git diff',
     category: 'Historique',
     title: 'Comparer les changements non indexes',
-    what: 'Affiche les differences entre le fichier courant et le dernier commit.',
+    what:
+        'Affiche les differences entre le fichier courant et le dernier commit.',
     when: 'Avant add/commit pour verifier ce que tu as modifie.',
     example: 'git diff',
     tip: 'Utilise git diff --staged pour ce qui est deja ajoute.',
@@ -638,7 +737,8 @@ const List<GitCommand> gitCommands = [
     what: 'Publie tes commits locaux sur le depot distant.',
     when: 'Quand ton travail local est propre et teste.',
     example: 'git push -u origin feature/profile-page',
-    tip: '-u lie la branche locale a la branche distante pour les prochains push.',
+    tip:
+        '-u lie la branche locale a la branche distante pour les prochains push.',
   ),
   GitCommand(
     command: 'git reset --soft HEAD~1',
@@ -700,7 +800,8 @@ const List<GitCommand> gitCommands = [
     command: 'git commit --amend',
     category: 'Correction',
     title: 'Modifier le dernier commit',
-    what: 'Permet de changer le message et/ou ajouter des fichiers au dernier commit.',
+    what:
+        'Permet de changer le message et/ou ajouter des fichiers au dernier commit.',
     when: 'Juste apres un commit local incomplet.',
     example: 'git commit --amend -m "fix: update login validation"',
     tip: 'A eviter si le commit est deja pousse sur une branche partagee.',
@@ -711,7 +812,8 @@ const List<GitCommand> gitCommands = [
     category: 'Fusion',
     title: 'Annuler un merge en cours',
     what: 'Revient a l etat avant tentative de merge en cas de conflits.',
-    when: 'Quand la resolution devient trop complexe et que tu veux repartir proprement.',
+    when:
+        'Quand la resolution devient trop complexe et que tu veux repartir proprement.',
     example: 'git merge --abort',
     tip: 'Commande utile avant de retenter apres mise a jour de la branche.',
     level: 'Avance',
@@ -915,7 +1017,8 @@ final List<LearningDay> learningPathDays = List.generate(30, (index) {
     id: 'day-$day',
     dayNumber: day,
     title: 'Jour $day: Focus $topic',
-    task: 'Lis la lecon associee, execute la commande dans un mini depot test, puis note ce que tu as compris en 2 lignes.',
+    task:
+        'Lis la lecon associee, execute la commande dans un mini depot test, puis note ce que tu as compris en 2 lignes.',
     expectedMinutes: 10 + (index % 3) * 5,
   );
 });
