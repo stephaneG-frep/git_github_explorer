@@ -1,11 +1,15 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
+  static const _storageSchemaVersion = 2;
   static const _onboardingDoneKey = 'onboarding_done';
+  static const _storageSchemaVersionKey = 'storage_schema_version';
+  static const _lastSavedAtKey = 'last_saved_at';
   static const _favoriteLessonIdsKey = 'favorite_lesson_ids';
   static const _completedLessonIdsKey = 'completed_lesson_ids';
   static const _completedExerciseIdsKey = 'completed_exercise_ids';
-  static const _completedCommandExerciseIdsKey = 'completed_command_exercise_ids';
+  static const _completedCommandExerciseIdsKey =
+      'completed_command_exercise_ids';
   static const _completedChallengeIdsKey = 'completed_challenge_ids';
   static const _completedPathDayIdsKey = 'completed_path_day_ids';
   static const _completedMissionIdsKey = 'completed_mission_ids';
@@ -28,14 +32,23 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
 
     return {
-      _favoriteLessonIdsKey: prefs.getStringList(_favoriteLessonIdsKey) ?? <String>[],
-      _completedLessonIdsKey: prefs.getStringList(_completedLessonIdsKey) ?? <String>[],
-      _completedExerciseIdsKey: prefs.getStringList(_completedExerciseIdsKey) ?? <String>[],
+      _storageSchemaVersionKey:
+          prefs.getInt(_storageSchemaVersionKey) ?? _storageSchemaVersion,
+      _lastSavedAtKey: prefs.getString(_lastSavedAtKey),
+      _favoriteLessonIdsKey:
+          prefs.getStringList(_favoriteLessonIdsKey) ?? <String>[],
+      _completedLessonIdsKey:
+          prefs.getStringList(_completedLessonIdsKey) ?? <String>[],
+      _completedExerciseIdsKey:
+          prefs.getStringList(_completedExerciseIdsKey) ?? <String>[],
       _completedCommandExerciseIdsKey:
           prefs.getStringList(_completedCommandExerciseIdsKey) ?? <String>[],
-      _completedChallengeIdsKey: prefs.getStringList(_completedChallengeIdsKey) ?? <String>[],
-      _completedPathDayIdsKey: prefs.getStringList(_completedPathDayIdsKey) ?? <String>[],
-      _completedMissionIdsKey: prefs.getStringList(_completedMissionIdsKey) ?? <String>[],
+      _completedChallengeIdsKey:
+          prefs.getStringList(_completedChallengeIdsKey) ?? <String>[],
+      _completedPathDayIdsKey:
+          prefs.getStringList(_completedPathDayIdsKey) ?? <String>[],
+      _completedMissionIdsKey:
+          prefs.getStringList(_completedMissionIdsKey) ?? <String>[],
       _earnedBadgesKey: prefs.getStringList(_earnedBadgesKey) ?? <String>[],
       _quizScoreKey: prefs.getInt(_quizScoreKey) ?? 0,
       _answeredQuestionsKey: prefs.getInt(_answeredQuestionsKey) ?? 0,
@@ -58,22 +71,47 @@ class LocalStorageService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setStringList(_favoriteLessonIdsKey, favoriteLessonIds.toList());
-    await prefs.setStringList(_completedLessonIdsKey, completedLessonIds.toList());
-    await prefs.setStringList(_completedExerciseIdsKey, completedExerciseIds.toList());
+    await prefs.setInt(_storageSchemaVersionKey, _storageSchemaVersion);
+    await prefs.setString(
+      _lastSavedAtKey,
+      DateTime.now().toUtc().toIso8601String(),
+    );
+    await prefs.setStringList(
+      _favoriteLessonIdsKey,
+      favoriteLessonIds.toList(),
+    );
+    await prefs.setStringList(
+      _completedLessonIdsKey,
+      completedLessonIds.toList(),
+    );
+    await prefs.setStringList(
+      _completedExerciseIdsKey,
+      completedExerciseIds.toList(),
+    );
     await prefs.setStringList(
       _completedCommandExerciseIdsKey,
       completedCommandExerciseIds.toList(),
     );
-    await prefs.setStringList(_completedChallengeIdsKey, completedChallengeIds.toList());
-    await prefs.setStringList(_completedPathDayIdsKey, completedPathDayIds.toList());
-    await prefs.setStringList(_completedMissionIdsKey, completedMissionIds.toList());
+    await prefs.setStringList(
+      _completedChallengeIdsKey,
+      completedChallengeIds.toList(),
+    );
+    await prefs.setStringList(
+      _completedPathDayIdsKey,
+      completedPathDayIds.toList(),
+    );
+    await prefs.setStringList(
+      _completedMissionIdsKey,
+      completedMissionIds.toList(),
+    );
     await prefs.setStringList(_earnedBadgesKey, earnedBadges.toList());
     await prefs.setInt(_quizScoreKey, quizScore);
     await prefs.setInt(_answeredQuestionsKey, answeredQuestions);
     await prefs.setStringList(
       _mistakeCountsKey,
-      mistakeCounts.entries.map((entry) => '${entry.key}:${entry.value}').toList(),
+      mistakeCounts.entries
+          .map((entry) => '${entry.key}:${entry.value}')
+          .toList(),
     );
   }
 }

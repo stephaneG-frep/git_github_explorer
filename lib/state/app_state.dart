@@ -7,6 +7,8 @@ import '../data/app_data.dart';
 import '../services/local_storage_service.dart';
 
 class AppState extends ChangeNotifier {
+  static const int backupSchemaVersion = 3;
+
   final Set<String> _favoriteLessonIds = <String>{};
   final Set<String> _completedLessonIds = <String>{};
   final Set<String> _completedExerciseIds = <String>{};
@@ -49,8 +51,12 @@ class AppState extends ChangeNotifier {
   }
 
   double get practiceProgress {
-    final total = guidedExercises.length + commandExercises.length + simpleChallenges.length;
-    final done = _completedExerciseIds.length +
+    final total =
+        guidedExercises.length +
+        commandExercises.length +
+        simpleChallenges.length;
+    final done =
+        _completedExerciseIds.length +
         _completedCommandExerciseIds.length +
         _completedChallengeIds.length;
     if (total == 0) {
@@ -74,8 +80,15 @@ class AppState extends ChangeNotifier {
   }
 
   double get globalProgress {
-    final quizPart = quizQuestions.isEmpty ? 0 : _answeredQuestions / quizQuestions.length;
-    return ((learningProgress + practiceProgress + roadmapProgress + missionProgress + quizPart) / 5)
+    final quizPart = quizQuestions.isEmpty
+        ? 0
+        : _answeredQuestions / quizQuestions.length;
+    return ((learningProgress +
+                practiceProgress +
+                roadmapProgress +
+                missionProgress +
+                quizPart) /
+            5)
         .clamp(0, 1);
   }
 
@@ -92,19 +105,28 @@ class AppState extends ChangeNotifier {
 
     _completedExerciseIds
       ..clear()
-      ..addAll((data['completed_exercise_ids'] as List<dynamic>).cast<String>());
+      ..addAll(
+        (data['completed_exercise_ids'] as List<dynamic>).cast<String>(),
+      );
 
     _completedCommandExerciseIds
       ..clear()
-      ..addAll((data['completed_command_exercise_ids'] as List<dynamic>).cast<String>());
+      ..addAll(
+        (data['completed_command_exercise_ids'] as List<dynamic>)
+            .cast<String>(),
+      );
 
     _completedChallengeIds
       ..clear()
-      ..addAll((data['completed_challenge_ids'] as List<dynamic>).cast<String>());
+      ..addAll(
+        (data['completed_challenge_ids'] as List<dynamic>).cast<String>(),
+      );
 
     _completedPathDayIds
       ..clear()
-      ..addAll((data['completed_path_day_ids'] as List<dynamic>).cast<String>());
+      ..addAll(
+        (data['completed_path_day_ids'] as List<dynamic>).cast<String>(),
+      );
 
     _completedMissionIds
       ..clear()
@@ -126,6 +148,8 @@ class AppState extends ChangeNotifier {
           return MapEntry(key, value);
         }),
       );
+
+    _sanitizeProgressData();
 
     notifyListeners();
   }
@@ -235,7 +259,8 @@ class AppState extends ChangeNotifier {
 
   String exportProgressJson() {
     final payload = <String, dynamic>{
-      'version': 2,
+      'version': backupSchemaVersion,
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'favoriteLessonIds': _favoriteLessonIds.toList(),
       'completedLessonIds': _completedLessonIds.toList(),
       'completedExerciseIds': _completedExerciseIds.toList(),
@@ -254,41 +279,113 @@ class AppState extends ChangeNotifier {
   Future<bool> importProgressJson(String rawJson) async {
     try {
       final decoded = jsonDecode(rawJson);
-      if (decoded is! Map<String, dynamic>) {
+      if (decoded is! Map) {
         return false;
       }
+      final payload = decoded.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
 
       _favoriteLessonIds
         ..clear()
-        ..addAll(_readStringSet(decoded['favoriteLessonIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'favoriteLessonIds',
+              'favorite_lesson_ids',
+            ]),
+          ),
+        );
       _completedLessonIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedLessonIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedLessonIds',
+              'completed_lesson_ids',
+            ]),
+          ),
+        );
       _completedExerciseIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedExerciseIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedExerciseIds',
+              'completed_exercise_ids',
+            ]),
+          ),
+        );
       _completedCommandExerciseIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedCommandExerciseIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedCommandExerciseIds',
+              'completed_command_exercise_ids',
+            ]),
+          ),
+        );
       _completedChallengeIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedChallengeIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedChallengeIds',
+              'completed_challenge_ids',
+            ]),
+          ),
+        );
       _completedPathDayIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedPathDayIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedPathDayIds',
+              'completed_path_day_ids',
+            ]),
+          ),
+        );
       _completedMissionIds
         ..clear()
-        ..addAll(_readStringSet(decoded['completedMissionIds']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const [
+              'completedMissionIds',
+              'completed_mission_ids',
+            ]),
+          ),
+        );
       _earnedBadges
         ..clear()
-        ..addAll(_readStringSet(decoded['earnedBadges']));
+        ..addAll(
+          _readStringSet(
+            _readAliased(payload, const ['earnedBadges', 'earned_badges']),
+          ),
+        );
 
-      _quizScore = (decoded['quizScore'] as num?)?.toInt() ?? 0;
-      _answeredQuestions = (decoded['answeredQuestions'] as num?)?.toInt() ?? 0;
+      _quizScore =
+          (_readAliased(payload, const ['quizScore', 'quiz_score']) as num?)
+              ?.toInt() ??
+          0;
+      _answeredQuestions =
+          (_readAliased(payload, const [
+                    'answeredQuestions',
+                    'answered_questions',
+                  ])
+                  as num?)
+              ?.toInt() ??
+          0;
 
       _mistakeCounts
         ..clear()
-        ..addAll(_readMistakeMap(decoded['mistakeCounts']));
+        ..addAll(
+          _readMistakeMap(
+            _readAliased(payload, const ['mistakeCounts', 'mistake_counts']),
+          ),
+        );
+
+      _sanitizeProgressData();
 
       _afterMutation();
       return true;
@@ -337,10 +434,53 @@ class AppState extends ChangeNotifier {
       for (final entry in value.entries) {
         final key = entry.key.toString();
         final count = (entry.value as num?)?.toInt() ?? 0;
-        result[key] = count;
+        result[key] = count < 0 ? 0 : count;
       }
       return result;
     }
     return <String, int>{};
   }
+
+  dynamic _readAliased(Map<String, dynamic> source, List<String> aliases) {
+    for (final key in aliases) {
+      if (source.containsKey(key)) {
+        return source[key];
+      }
+    }
+    return null;
+  }
+
+  void _sanitizeProgressData() {
+    _favoriteLessonIds.removeWhere((id) => !_knownLessonIds.contains(id));
+    _completedLessonIds.removeWhere((id) => !_knownLessonIds.contains(id));
+    _completedExerciseIds.removeWhere((id) => !_knownExerciseIds.contains(id));
+    _completedCommandExerciseIds.removeWhere(
+      (id) => !_knownCommandExerciseIds.contains(id),
+    );
+    _completedChallengeIds.removeWhere(
+      (id) => !_knownChallengeIds.contains(id),
+    );
+    _completedPathDayIds.removeWhere((id) => !_knownPathDayIds.contains(id));
+    _completedMissionIds.removeWhere((id) => !_knownMissionIds.contains(id));
+    _earnedBadges.removeWhere((name) => !badgeNames.contains(name));
+    _mistakeCounts.removeWhere((key, _) => !_knownConceptKeys.contains(key));
+
+    final maxAnswers = quizQuestions.length;
+    _answeredQuestions = _answeredQuestions.clamp(0, maxAnswers);
+    _quizScore = _quizScore.clamp(0, _answeredQuestions);
+  }
+
+  Set<String> get _knownLessonIds => lessons.map((item) => item.id).toSet();
+  Set<String> get _knownExerciseIds =>
+      guidedExercises.map((item) => item.id).toSet();
+  Set<String> get _knownCommandExerciseIds =>
+      commandExercises.map((item) => item.id).toSet();
+  Set<String> get _knownChallengeIds =>
+      simpleChallenges.map((item) => item.id).toSet();
+  Set<String> get _knownPathDayIds =>
+      learningPathDays.map((item) => item.id).toSet();
+  Set<String> get _knownMissionIds =>
+      missionScenarios.map((item) => item.id).toSet();
+  Set<String> get _knownConceptKeys =>
+      quizQuestions.map((item) => item.conceptKey).toSet();
 }
